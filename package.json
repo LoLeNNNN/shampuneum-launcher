@@ -38,8 +38,6 @@
     "electron-updater": "^6.1.1",
     "express": "^4.18.2",
     "minecraft-launcher-core": "^3.18.2",
-    "mysql2": "^3.6.0",
-    "nlogin-js": "^2.0.6",
     "node-fetch": "^2.6.7",
     "progress": "^2.0.3"
   },
