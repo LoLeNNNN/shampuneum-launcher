@@ -1,0 +1,51 @@
+{
+  "name": "shampuneum-launcher",
+  "version": "1.0.0",
+  "description": "Shampuneum Minecraft Launcher",
+  "main": "Launcher/main.js",
+  "scripts": {
+    "start": "chcp 65001 && electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder -w portable",
+    "postinstall": "electron-builder install-app-deps",
+    "watch": "nodemon --watch main.js --watch launcher.js --watch installer.js --exec electron ."
+  },
+  "build": {
+    "appId": "com.shampuneum.launcher",
+    "productName": "Shampuneum Launcher",
+    "copyright": "Copyright © 2025 Shampuneum",
+    "win": {
+      "target": "portable",
+      "icon": "Launcher/renderer/images/ico.ico",
+      "artifactName": "ShampUneumLauncher.exe"
+    },
+    "directories": {
+      "buildResources": "build",
+      "output": "dist"
+    },
+    "files": [
+      "Launcher/**/*",
+      "!Launcher/**/*.map",
+      "!Launcher/**/*.log"
+    ],
+    "portable": {
+      "artifactName": "ShampUneumLauncher.exe"
+    }
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.10",
+    "cors": "^2.8.5",
+    "electron-updater": "^6.1.1",
+    "express": "^4.18.2",
+    "minecraft-launcher-core": "^3.18.2",
+    "mysql2": "^3.6.0",
+    "nlogin-js": "^2.0.6",
+    "node-fetch": "^2.6.7",
+    "progress": "^2.0.3"
+  },
+  "devDependencies": {
+    "electron": "^37.2.4",
+    "electron-builder": "^26.0.12",
+    "nodemon": "^3.0.1"
+  }
+}
