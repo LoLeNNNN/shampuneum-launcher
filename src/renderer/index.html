@@ -212,31 +212,25 @@
   let isAuthenticated = false;
   let currentUser = null;
 
-  // Получение элементов DOM
   const elements = {
-    // Авторизация
     loginModal: document.getElementById('login-modal'),
     loginButton: document.getElementById('login-button'),
     usernameInput: document.getElementById('username'),
     passwordInput: document.getElementById('password'),
 
-    // Основной интерфейс
     launcher: document.getElementById('launcher'),
     usernameDisplay: document.getElementById('username-display'),
     userAccess: document.getElementById('user-access'),
 
-    // Кнопки управления
     installBtn: document.getElementById('install'),
     playBtn: document.getElementById('play-btn'),
     checkStatusBtn: document.getElementById('check-status'),
     exitBtn: document.getElementById('logout'),
 
-    // Статус
     statusDot: document.getElementById('status-dot'),
     statusText: document.getElementById('status-text'),
     statusContainer: document.getElementById('status-container'),
 
-    // Настройки
     maxMemoryInput: document.getElementById('max-memory'),
     maxMemoryValue: document.getElementById('max-memory-value'),
     minMemorySelect: document.getElementById('min-memory'),
@@ -244,7 +238,6 @@
     selectJavaPathBtn: document.getElementById('select-java-path'),
     saveSettingsBtn: document.getElementById('save-settings'),
 
-    // Интерфейс
     menuItems: document.querySelectorAll('.menu-item'),
     tabContents: document.querySelectorAll('.tab-content'),
     toast: document.getElementById('toast'),
@@ -253,7 +246,6 @@
     versionSelect: document.getElementById('version-select')
   };
 
-  // Утилиты
   function appendLog(text, type = 'info') {
     const timestamp = new Date().toLocaleTimeString();
     const logEntry = `[${timestamp}] [${type.toUpperCase()}] ${text}`;
@@ -298,7 +290,6 @@
   }
 
   function updateButtonStates() {
-    // Скрываем все кнопки сначала
     if (elements.installBtn) elements.installBtn.classList.add('hidden');
     if (elements.playBtn) elements.playBtn.classList.add('hidden');
     if (elements.checkStatusBtn) elements.checkStatusBtn.classList.add('hidden');
@@ -318,7 +309,6 @@
       }
       updateStatus('installing', 'Запуск игры...');
     } else {
-      // Сбрасываем текст кнопок
       if (elements.installBtn) {
         elements.installBtn.disabled = false;
         elements.installBtn.textContent = 'УСТАНОВИТЬ';
@@ -328,7 +318,6 @@
         elements.playBtn.textContent = 'ИГРАТЬ';
       }
 
-      // Показываем нужные кнопки в зависимости от статуса
       if (isClientInstalled) {
         if (elements.playBtn) elements.playBtn.classList.remove('hidden');
         if (elements.checkStatusBtn) elements.checkStatusBtn.classList.remove('hidden');
@@ -341,7 +330,6 @@
     }
   }
 
-  // Проверка статуса клиента
   async function checkClientStatus() {
     if (!isElectron || !electronAPI) {
       appendLog('Проверка статуса доступна только в приложении', 'warning');
@@ -390,7 +378,6 @@
     });
   }
 
-  // Авторизация
   async function checkAuth() {
     try {
       if (isElectron && electronAPI) {
@@ -422,7 +409,6 @@
 
     appendLog(`Пользователь ${user.username} авторизован`, 'success');
     
-    // Проверяем статус клиента после авторизации
     setTimeout(() => {
       checkClientStatus();
     }, 500);
@@ -471,7 +457,6 @@
     }
   }
 
-  // Установка и запуск
   async function handleInstall() {
     if (isInstalling || !isAuthenticated) return;
 
@@ -496,7 +481,6 @@
       const result = await electronAPI.installClient(options);
       appendLog(`Установка завершена: ${result.message || 'Успешно'}`, 'success');
       
-      // Проверяем статус после установки
       await checkClientStatus();
       
       showToast('Клиент успешно установлен!', 'success');
@@ -555,7 +539,6 @@
     }
   }
 
-  // Настройки
   async function loadSettings() {
     if (!isElectron || !electronAPI) return;
 
@@ -577,7 +560,7 @@
           elements.javaPathInput.value = settings.javaPath || '(Автоматически)';
         }
         if (elements.versionSelect && settings.modpack) {
-          elements.versionSelect.value = settings.modpack; // Загружаем сохранённый модпак
+          elements.versionSelect.value = settings.modpack; 
           appendLog(`Загружен модпак: ${settings.modpack}`, 'info');
         }
         appendLog('Настройки загружены', 'success');
@@ -594,7 +577,7 @@
       maxMemory: elements.maxMemoryInput ? `${elements.maxMemoryInput.value}G` : '4G',
       minMemory: elements.minMemorySelect ? elements.minMemorySelect.value : '2G',
       javaPath: elements.javaPathInput ? elements.javaPathInput.value : '(Автоматически)',
-      modpack: elements.versionSelect ? elements.versionSelect.value : 'ULTRA' // Сохраняем выбранный модпак
+      modpack: elements.versionSelect ? elements.versionSelect.value : 'ULTRA'
     };
 
     try {
@@ -661,14 +644,11 @@
     }
   }
 
-  // Обработчики событий
   function setupEventListeners() {
-    // Авторизация
     if (elements.loginButton) {
       elements.loginButton.addEventListener('click', handleLogin);
     }
 
-    // Управление
     if (elements.installBtn) {
       elements.installBtn.addEventListener('click', handleInstall);
     }
@@ -681,11 +661,9 @@
       elements.checkStatusBtn.addEventListener('click', checkClientStatus);
     }
 
-    // Специальные обработчики
     setupJavaPathHandler();
     setupExitHandler();
 
-    // Меню
     elements.menuItems.forEach(item => {
       item.addEventListener('click', () => {
         const tab = item.dataset.tab;
@@ -693,7 +671,6 @@
       });
     });
 
-    // Настройки
     if (elements.maxMemoryInput) {
       elements.maxMemoryInput.addEventListener('input', () => {
         const value = parseInt(elements.maxMemoryInput.value);
@@ -708,7 +685,6 @@
       elements.saveSettingsBtn.addEventListener('click', saveSettings);
     }
 
-    // Клавиатурные сокращения
     document.addEventListener('keydown', (event) => {
       if (event.key === 'F5') {
         event.preventDefault();
@@ -731,11 +707,9 @@
     });
   }
 
-  // IPC события (только для Electron)
   function setupIpcListeners() {
     if (!isElectron || !electronAPI) return;
 
-    // Слушаем события от main процесса
     if (window.electronAPI && window.electronAPI.onLogMessage) {
       window.electronAPI.onLogMessage((message, type) => {
         appendLog(message, type);
@@ -752,7 +726,6 @@
     }
   }
 
-  // Инициализация
   async function initialize() {
     appendLog('=== SHAMPUNEUM LAUNCHER ===');
     appendLog(`Запущен в режиме: ${isElectron ? 'Electron приложение' : 'Браузер (демо)'}`);
@@ -771,7 +744,6 @@
       if (elements.launcher) elements.launcher.style.display = 'none';
       updateStatus('offline', 'Не авторизован');
     } else {
-      // Проверяем статус клиента после авторизации
       setTimeout(() => {
         checkClientStatus();
       }, 1000);
@@ -780,7 +752,6 @@
     appendLog('Готов к работе!', 'success');
   }
 
-  // Запуск
   document.addEventListener('DOMContentLoaded', async () => {
     setupEventListeners();
 
@@ -795,8 +766,6 @@
       await initialize();
     }, 1500);
   });
-
-  // Экспорт для глобального доступа (если нужно)
   if (typeof window !== 'undefined') {
     window.launcherAPI = {
       showToast,

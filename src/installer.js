@@ -387,7 +387,7 @@ function downloadResourcePack(sendLogToRenderer) {
       })
       .catch((error) => {
         sendLogToRenderer(`Ошибка загрузки ресурспака: ${error.message}`, "error");
-        resolve(); // Оставляем resolve, как в вашем коде
+        resolve();
       });
   });
 }
@@ -413,7 +413,6 @@ function downloadModpack(modpackType, sendLogToRenderer) {
       .then(() => {
         sendLogToRenderer(`Разархивирование модпака ${modpackType}...`, "info");
         try {
-          // Очистка папки mods перед разархивированием
           if (fs.existsSync(modsDir)) {
             fs.rmSync(modsDir, { recursive: true, force: true });
           }
@@ -421,7 +420,7 @@ function downloadModpack(modpackType, sendLogToRenderer) {
 
           const zip = new AdmZip(modpackPath);
           zip.extractAllTo(modsDir, true);
-          fs.unlinkSync(modpackPath); // Удаляем архив после распаковки
+          fs.unlinkSync(modpackPath);
           sendLogToRenderer(`Модпак ${modpackType} успешно установлен`, "success");
           resolve();
         } catch (error) {
