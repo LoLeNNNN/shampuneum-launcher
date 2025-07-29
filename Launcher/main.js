@@ -74,7 +74,7 @@ function sendLogToRenderer(message, type = "info") {
   }
 }
 
-// IPC обработчики
+// IPC handlers
 ipcMain.handle("check-game-status", async () => {
   try {
     const status = await checkGameStatus();
@@ -135,12 +135,13 @@ ipcMain.handle("install-client", async (event, options = {}) => {
       maxFps: options.maxFps || "120",
       language: options.language || "ru_ru",
       autoConnectServer: options.autoConnectServer || false,
+      modpack: options.modpack || "ULTRA", // Default to ULTRA
     };
 
     const result = await installClient(currentUsername, installOptions, sendLogToRenderer);
     sendLogToRenderer("Установка клиента завершена успешно!", "success");
     
-    // Обновляем статус после установки
+    // Update status after installation
     const newStatus = await checkGameStatus();
     mainWindow.webContents.send("installation-status", newStatus);
     
@@ -212,9 +213,9 @@ ipcMain.handle("load-settings", () => {
     if (fs.existsSync(configPath)) {
       return JSON.parse(fs.readFileSync(configPath));
     }
-    return { maxMemory: "4G", minMemory: "2G", javaPath: "(Автоматически)" };
+    return { maxMemory: "4G", minMemory: "2G", javaPath: "(Автоматически)", modpack: "ULTRA" };
   } catch (error) {
-    return { maxMemory: "4G", minMemory: "2G", javaPath: "(Автоматически)" };
+    return { maxMemory: "4G", minMemory: "2G", javaPath: "(Автоматически)", modpack: "ULTRA" };
   }
 });
 

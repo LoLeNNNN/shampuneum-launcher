@@ -11,7 +11,7 @@ const VERSION_CONFIG = {
   "1.21.8": {
     number: "1.21.8",
     type: "release",
-    fabric: "0.16.0",
+    fabric: "0.16.14",
   },
 };
 
