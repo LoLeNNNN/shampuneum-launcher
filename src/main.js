@@ -5,7 +5,9 @@ const os = require("os");
 const { installClient } = require("./installer");
 const { launchMinecraft, checkGameStatus } = require("./launcher");
 const fetch = require("node-fetch");
+const { LauncherUpdater } = require("./updater");
 
+let updater;
 let mainWindow;
 let currentUsername = null;
 
@@ -41,14 +43,23 @@ function createWindow() {
     frame: true,
     titleBarStyle: "default",
   });
+  updater = new LauncherUpdater(mainWindow);
 
   checkGameStatus()
     .then((status) => {
       mainWindow.webContents.on("did-finish-load", () => {
         sendLogToRenderer("Лаунчер загружен успешно!");
-        sendLogToRenderer(`Статус клиента: ${status.clientInstalled ? 'установлен' : 'не установлен'}`, 'info');
+        sendLogToRenderer(
+          `Статус клиента: ${
+            status.clientInstalled ? "установлен" : "не установлен"
+          }`,
+          "info"
+        );
         if (status.details) {
-          sendLogToRenderer(`Детали: Vanilla=${status.details.vanilla}, Fabric=${status.details.fabric}`, 'info');
+          sendLogToRenderer(
+            `Детали: Vanilla=${status.details.vanilla}, Fabric=${status.details.fabric}`,
+            "info"
+          );
         }
         mainWindow.webContents.send("installation-status", status);
       });
@@ -56,7 +67,9 @@ function createWindow() {
     .catch((error) => {
       sendLogToRenderer(`Ошибка проверки статуса: ${error.message}`, "error");
     });
-
+  setTimeout(() => {
+    updater.startAutoCheck();
+  }, 5000);
   mainWindow.loadFile(path.join(__dirname, "renderer", "index.html"));
 
   if (process.env.NODE_ENV === "development") {
@@ -84,7 +97,7 @@ ipcMain.handle("check-game-status", async () => {
       clientInstalled: false,
       versionsAvailable: false,
       clientPath: mcRoot,
-      error: error.message
+      error: error.message,
     };
   }
 });
@@ -126,7 +139,10 @@ ipcMain.handle("install-client", async (event, options = {}) => {
       throw new Error("Пользователь не авторизован");
     }
 
-    sendLogToRenderer(`Начинается установка клиента для ${currentUsername}...`, "info");
+    sendLogToRenderer(
+      `Начинается установка клиента для ${currentUsername}...`,
+      "info"
+    );
 
     const installOptions = {
       ...options,
@@ -138,13 +154,17 @@ ipcMain.handle("install-client", async (event, options = {}) => {
       modpack: options.modpack || "ULTRA", // Default to ULTRA
     };
 
-    const result = await installClient(currentUsername, installOptions, sendLogToRenderer);
+    const result = await installClient(
+      currentUsername,
+      installOptions,
+      sendLogToRenderer
+    );
     sendLogToRenderer("Установка клиента завершена успешно!", "success");
-    
+
     // Update status after installation
     const newStatus = await checkGameStatus();
     mainWindow.webContents.send("installation-status", newStatus);
-    
+
     return result;
   } catch (error) {
     sendLogToRenderer(`Ошибка установки: ${error.message}`, "error");
@@ -213,12 +233,53 @@ ipcMain.handle("load-settings", () => {
     if (fs.existsSync(configPath)) {
       return JSON.parse(fs.readFileSync(configPath));
     }
-    return { maxMemory: "4G", minMemory: "2G", javaPath: "(Автоматически)", modpack: "ULTRA" };
+    return {
+      maxMemory: "4G",
+      minMemory: "2G",
+      javaPath: "(Автоматически)",
+      modpack: "ULTRA",
+    };
   } catch (error) {
-    return { maxMemory: "4G", minMemory: "2G", javaPath: "(Автоматически)", modpack: "ULTRA" };
+    return {
+      maxMemory: "4G",
+      minMemory: "2G",
+      javaPath: "(Автоматически)",
+      modpack: "ULTRA",
+    };
   }
 });
+ipcMain.handle("check-updates", async () => {
+  if (updater) {
+    return await updater.checkForUpdates(true);
+  }
+  return { available: false, error: "Updater not initialized" };
+});
 
+ipcMain.handle("download-update", async (_, downloadUrl, fileName) => {
+  if (updater) {
+    try {
+      await updater.downloadAndInstall(downloadUrl, fileName);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+  return { success: false, error: "Updater not initialized" };
+});
+
+ipcMain.handle("skip-update-version", async (_, version) => {
+  try {
+    ensureConfigDirectoryExists();
+    const config = fs.existsSync(configPath)
+      ? JSON.parse(fs.readFileSync(configPath))
+      : {};
+    config.skippedVersion = version;
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
 app.whenReady().then(() => {
   createWindow();
   app.on("activate", () => {

@@ -35,7 +35,9 @@
       "target": [
         {
           "target": "portable",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "assets/icon.ico",
@@ -57,7 +59,12 @@
     "type": "git",
     "url": "https://github.com/твой-username/shampuneum-launcher.git"
   },
-  "keywords": ["minecraft", "launcher", "shampuneum", "electron"],
+  "keywords": [
+    "minecraft",
+    "launcher",
+    "shampuneum",
+    "electron"
+  ],
   "author": "Твоё имя",
   "license": "MIT",
   "dependencies": {

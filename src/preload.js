@@ -35,5 +35,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   onUpdateAvailable: (callback) => {
     ipcRenderer.on('update-available', (event) => callback());
-  }
+  },
+    // Методы для обновлений
+  checkUpdates: () => ipcRenderer.invoke('check-updates'),
+  downloadUpdate: (downloadUrl, fileName) => ipcRenderer.invoke('download-update', downloadUrl, fileName),
+  skipUpdateVersion: (version) => ipcRenderer.invoke('skip-update-version', version),
+  
+  // События обновлений
+  onUpdateAvailable: (callback) => ipcRenderer.on('update-available', callback),
+  onUpdateProgress: (callback) => ipcRenderer.on('update-progress', callback),
+  onUpdateStatus: (callback) => ipcRenderer.on('update-status', callback)
 });
