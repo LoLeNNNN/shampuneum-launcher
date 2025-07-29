@@ -1,0 +1,81 @@
+{
+  "name": "shampuneum-launcher",
+  "version": "1.0.0",
+  "description": "Shampuneum Minecraft Launcher",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "chcp 65001 && electron .",
+    "dev": "NODE_ENV=development electron .",
+    "build": "electron-builder",
+    "build-portable": "electron-builder --win portable --publish=never",
+    "release": "electron-builder --publish=always",
+    "test-update": "node test-updater.js"
+  },
+  "build": {
+    "appId": "com.shampuneum.launcher",
+    "productName": "Shampuneum Launcher",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+      "!**/node_modules/*.d.ts",
+      "!**/node_modules/.bin",
+      "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
+      "!.editorconfig",
+      "!**/._*",
+      "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
+      "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
+      "!**/{appveyor.yml,.travis.yml,circle.yml}",
+      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico",
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-portable.${ext}"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "LoLeNNNN",
+      "repo": "shampuneum-launcher",
+      "vPrefixedTagName": true,
+      "releaseType": "release"
+    },
+    "compression": "maximum"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/твой-username/shampuneum-launcher.git"
+  },
+  "keywords": [
+    "minecraft",
+    "launcher",
+    "shampuneum",
+    "electron"
+  ],
+  "author": "Твоё имя",
+  "license": "MIT",
+  "dependencies": {
+    "adm-zip": "^0.5.10",
+    "electron-updater": "^6.1.1",
+    "fs-extra": "^11.3.0",
+    "minecraft-launcher-core": "^3.18.2",
+    "node-fetch": "^2.6.7"
+  },
+  "devDependencies": {
+    "electron": "^37.2.4",
+    "electron-builder": "^26.0.12"
+  }
+}

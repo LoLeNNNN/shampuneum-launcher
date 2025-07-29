@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shampuneum Launcher</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="loader">
+    <div class="loader-text">Загрузка лаунчера...</div>
+  </div>
+
+  <div class="toast" id="toast">
+    <div class="toast-icon">✓</div>
+    <div class="toast-message"></div>
+  </div>
+
+  <div id="login-modal">
+    <div class="settings-form">
+      <h2>Авторизация</h2>
+      <div class="form-group">
+        <label for="username">Имя пользователя</label>
+        <input type="text" id="username" placeholder="Введите имя пользователя">
+      </div>
+      <div class="form-group">
+        <label for="password">Пароль</label>
+        <input type="password" id="password" placeholder="Введите пароль">
+      </div>
+      <button id="login-button" class="play-btn">Войти</button>
+    </div>
+  </div>
+  <div id="update-modal" class="modal" style="display: none;">
+    <div class="modal-overlay"></div>
+    <div class="modal-content update-modal">
+      <div class="update-header">
+        <h2>🎉 Доступно обновление!</h2>
+        <div class="update-version">
+          Версия <span id="update-version-text">1.0.1</span>
+        </div>
+      </div>
+
+      <div class="update-info">
+        <div class="update-details">
+          <div class="detail-item">
+            <span class="detail-label">Размер:</span>
+            <span id="update-size-text">25.4 MB</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Дата выпуска:</span>
+            <span id="update-date-text">29.07.2025</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Тип:</span>
+            <span id="update-type-text">Портативная версия</span>
+          </div>
+        </div>
+
+        <div class="changelog-section">
+          <h3>Что нового:</h3>
+          <div class="changelog" id="update-changelog">
+            Загрузка информации об изменениях...
+          </div>
+        </div>
+      </div>
+
+      <!-- Прогресс скачивания -->
+      <div class="update-progress-section" id="update-progress-section" style="display: none;">
+        <div class="progress-info">
+          <span>Скачивание обновления...</span>
+          <span id="progress-percentage">0%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="update-progress-fill"></div>
+        </div>
+      </div>
+
+      <div class="modal-buttons">
+        <button id="update-now-btn" class="play-btn">
+          <span class="btn-icon">⬇️</span>
+          Обновить сейчас
+        </button>
+        <button id="update-later-btn" class="secondary-btn">Позже</button>
+        <button id="skip-version-btn" class="text-btn">Пропустить версию</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="launcher" id="launcher">
+    <div class="sidebar">
+      <div class="avatar">
+        <img src="images/image-44.png" alt="User Avatar">
+        <div class="update-badge" id="update-badge">1</div>
+      </div>
+      <ul class="nav">
+        <li class="menu-item active" data-tab="home">
+          <img src="images/home-25.svg" alt="Home Icon">Главная
+        </li>
+        <li class="menu-item" data-tab="profile">
+          <img src="images/identity_platform-31.svg" alt="Profile Icon">Профиль
+        </li>
+        <li class="menu-item" data-tab="settings">
+          <img src="images/settings-34.svg" alt="Settings Icon">Настройки
+        </li>
+        <li class="menu-item" data-tab="logs">
+          <img src="images/logs-icon.svg" alt="Logs Icon">Логи
+        </li>
+      </ul>
+      <div id="logout" class="logout"><img src="images/logout-28.svg" alt="Logout Icon">Выйти</div>
+    </div>
+    <div class="main">
+      <!-- Главная вкладка -->
+      <div id="home-tab" class="tab-content active">
+        <div class="hero">
+          <div class="text">
+            <h1>SHAMPUNEUM</h1>
+            <p>SHAMPUNEUM — это приватный ванильный сервер, с хорошими плагинами
+              и стабильным тпс. Подай заявку сегодня
+              и становись частью нашего комьюнити.</p>
+          </div>
+          <div class="version-info">Лаунчер v1.0.1</div>
+        </div>
+        <div class="footer">
+          <div class="user-info">
+            <div class="avatar-sm">
+              <img src="images/image-20-41.png" alt="Small Avatar">
+            </div>
+            <div class="details">
+              <div class="name" id="username-display">Не авторизован<span class="online-status"></span></div>
+              <div id="user-access">Проходка: неизвестно</div>
+            </div>
+          </div>
+          <div class="controls">
+            <div class="status" id="status-container">
+              <div id="status-dot" class="status-dot"></div>
+              <span id="status-text">Проверка статуса...</span>
+            </div>
+            <select id="version-select">
+              <option value="1.21.8-ultra">Fabric 1.21.8 ULTRA</option>
+              <option value="1.21.8-medium" selected>Fabric 1.21.8 MEDIUM</option>
+              <option value="1.21.8-low">Fabric 1.21.8 LOW</option>
+            </select>
+            <button id="install" class="play-btn hidden">УСТАНОВИТЬ</button>
+            <button id="play-btn" class="play-btn hidden">ИГРАТЬ</button>
+          </div>
+        </div>
+      </div>
+      <!-- Профиль -->
+      <div id="profile-tab" class="tab-content">
+        <div class="settings-form">
+          <h2>ПРОФИЛЬ</h2>
+          <p>Управление игровыми профилями</p>
+
+          <div class="form-group">
+            <label>Текущий профиль</label>
+            <div class="user-info" style="margin-top: 10px;">
+              <div class="avatar-sm">
+                <img src="images/image-20-41.png" alt="Small Avatar">
+              </div>
+              <div class="details">
+                <div class="name">neettik<span class="online-status"></span></div>
+                <div>Проходка: навсегда</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="skin-upload">//todo Загрузить скин</label>
+            <input type="file" id="skin-upload" accept="image/png" style="margin-top: 8px;">
+          </div>
+
+          <button class="play-btn" style="align-self: flex-start; margin-top: 20px;">Сохранить профиль</button>
+        </div>
+      </div>
+
+      <!-- Настройки -->
+      <div id="settings-tab" class="tab-content">
+        <div class="settings-form">
+          <h2>НАСТРОЙКИ</h2>
+          <p>Настройте параметры лаунчера и игры для оптимального опыта.</p>
+
+          <div class="form-group">
+            <label for="max-memory">
+              Максимальная память (ГБ):
+              <span class="tooltip">?
+                <span class="tooltip-text">Рекомендуется выделять не более 70% от общей оперативной памяти</span>
+              </span>
+            </label>
+            <div class="memory-control">
+              <input type="range" id="max-memory" min="1" max="16" value="4" style="width: 100%;">
+              <span id="max-memory-value">4 GB</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="min-memory">
+              Минимальная память (ГБ):
+              <span class="tooltip">?
+                <span class="tooltip-text">Минимальный объем памяти, выделяемый при запуске</span>
+              </span>
+            </label>
+            <select id="min-memory" class="controls-select">
+              <option value="1G">1 GB</option>
+              <option value="2G" selected>2 GB</option>
+              <option value="3G">3 GB</option>
+              <option value="4G">4 GB</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="java-path">
+              Путь к Java:
+              <span class="tooltip">?
+                <span class="tooltip-text">Оставьте "Автоматически" для использования системной Java</span>
+              </span>
+            </label>
+            <div class="java-path-group">
+              <input type="text" id="java-path" value="(Автоматически)" readonly>
+              <button id="select-java-path" class="play-btn"
+                style="padding: 10px 20px; font-size: 14px;">Выбрать</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="launch-options">//todo Дополнительные параметры запуска</label>
+            <textarea id="launch-options" rows="3"
+              style="width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #2c3a45; background-color: #1e2a33; color: var(--text-light); resize: vertical;"></textarea>
+          </div>
+
+          <button id="save-settings" class="play-btn">Сохранить настройки</button>
+        </div>
+      </div>
+
+      <!-- Логи -->
+      <div id="logs-tab" class="tab-content">
+        <div class="settings-form">
+          <h2>ЖУРНАЛ СОБЫТИЙ</h2>
+          <p>История работы лаунчера</p>
+
+          <div id="log-container"
+            style="background-color: #1e2a33; border-radius: 8px; padding: 20px; color: var(--text-light); font-family: monospace; height: 100%; overflow-y: auto; white-space: pre-wrap;">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Объединенный скрипт для Shampuneum Launcher
+    (function () {
+      // Проверяем окружение
+      const isElectron = typeof window !== 'undefined' && window.electronAPI;
+      let electronAPI = null;
+
+      if (isElectron) {
+        electronAPI = window.electronAPI;
+      }
+
+      // Состояние приложения
+      let isInstalling = false;
+      let isPlaying = false;
+      let isClientInstalled = false;
+      let clientStatus = null;
+      let currentTab = 'home';
+      let logs = [];
+      let updateAvailable = false;
+      let isAuthenticated = false;
+      let currentUser = null;
+      let currentUpdateInfo = null;
+      let isUpdating = false;
+
+      const elements = {
+        loginModal: document.getElementById('login-modal'),
+        loginButton: document.getElementById('login-button'),
+        usernameInput: document.getElementById('username'),
+        passwordInput: document.getElementById('password'),
+
+        launcher: document.getElementById('launcher'),
+        usernameDisplay: document.getElementById('username-display'),
+        userAccess: document.getElementById('user-access'),
+
+        installBtn: document.getElementById('install'),
+        playBtn: document.getElementById('play-btn'),
+        checkStatusBtn: document.getElementById('check-status'),
+        exitBtn: document.getElementById('logout'),
+
+        statusDot: document.getElementById('status-dot'),
+        statusText: document.getElementById('status-text'),
+        statusContainer: document.getElementById('status-container'),
+
+        maxMemoryInput: document.getElementById('max-memory'),
+        maxMemoryValue: document.getElementById('max-memory-value'),
+        minMemorySelect: document.getElementById('min-memory'),
+        javaPathInput: document.getElementById('java-path'),
+        selectJavaPathBtn: document.getElementById('select-java-path'),
+        saveSettingsBtn: document.getElementById('save-settings'),
+
+        menuItems: document.querySelectorAll('.menu-item'),
+        tabContents: document.querySelectorAll('.tab-content'),
+        toast: document.getElementById('toast'),
+        logContainer: document.getElementById('log-container'),
+        updateBadge: document.getElementById('update-badge'),
+        versionSelect: document.getElementById('version-select')
+      };
+
+      function appendLog(text, type = 'info') {
+        const timestamp = new Date().toLocaleTimeString();
+        const logEntry = `[${timestamp}] [${type.toUpperCase()}] ${text}`;
+        console.log(logEntry);
+
+        logs.push(logEntry);
+
+        if (elements.logContainer) {
+          elements.logContainer.textContent = logs.join('\n');
+          elements.logContainer.scrollTop = elements.logContainer.scrollHeight;
+        }
+      }
+
+      function showToast(message, type = 'success') {
+        if (!elements.toast) return;
+
+        const messageEl = elements.toast.querySelector('.toast-message');
+        if (messageEl) messageEl.textContent = message;
+
+        elements.toast.className = `toast ${type} show`;
+
+        setTimeout(() => {
+          elements.toast.classList.remove('show');
+        }, 3000);
+      }
+      function setupUpdateHandlers() {
+        const updateModal = document.getElementById('update-modal');
+        const updateNowBtn = document.getElementById('update-now-btn');
+        const updateLaterBtn = document.getElementById('update-later-btn');
+        const skipVersionBtn = document.getElementById('skip-version-btn');
+
+        // Показать обновление
+        if (window.electronAPI && window.electronAPI.onUpdateAvailable) {
+          window.electronAPI.onUpdateAvailable((event, updateInfo) => {
+            showUpdateModal(updateInfo);
+          });
+        }
+
+        // Прогресс обновления
+        if (window.electronAPI && window.electronAPI.onUpdateProgress) {
+          window.electronAPI.onUpdateProgress((event, progress) => {
+            updateDownloadProgress(progress);
+          });
+        }
+
+        // Обновить сейчас
+        // Обновить сейчас
+        if (updateNowBtn) {
+          updateNowBtn.addEventListener('click', handleUpdateDownload);
+        }
+        if (updateLaterBtn) {
+          updateLaterBtn.addEventListener('click', () => {
+            hideUpdateModal();
+            showToast('Обновление отложено', 'info');
+          });
+        }
+
+        // Пропустить версию
+        if (skipVersionBtn) {
+          skipVersionBtn.addEventListener('click', async () => {
+            if (!currentUpdateInfo) return;
+
+            try {
+              await window.electronAPI.skipUpdateVersion(currentUpdateInfo.version);
+              hideUpdateModal();
+              showToast(`Версия ${currentUpdateInfo.version} пропущена`, 'info');
+            } catch (error) {
+              showToast('Ошибка при пропуске версии', 'error');
+            }
+          });
+        }
+      }
+
+      function showUpdateModal(updateInfo) {
+        currentUpdateInfo = updateInfo;
+
+        // Заполняем информацию
+        const versionText = document.getElementById('update-version-text');
+        const sizeText = document.getElementById('update-size-text');
+        const dateText = document.getElementById('update-date-text');
+        const typeText = document.getElementById('update-type-text');
+        const changelog = document.getElementById('update-changelog');
+
+        if (versionText) versionText.textContent = updateInfo.version;
+        if (sizeText) sizeText.textContent = updateInfo.size;
+        if (dateText) dateText.textContent = updateInfo.publishDate;
+        if (typeText) typeText.textContent = updateInfo.isPortable ? 'Портативная версия' : 'Установщик';
+        if (changelog) changelog.textContent = updateInfo.changelog;
+
+        // Показываем модальное окно
+        const modal = document.getElementById('update-modal');
+        if (modal) {
+          modal.style.display = 'flex';
+
+          // Добавляем анимацию появления
+          setTimeout(() => {
+            modal.classList.add('show');
+          }, 10);
+        }
+
+        appendLog(`Доступно обновление до версии ${updateInfo.version}`, 'info');
+      }
+
+      function hideUpdateModal() {
+        const modal = document.getElementById('update-modal');
+        if (modal) {
+          modal.classList.remove('show');
+          setTimeout(() => {
+            modal.style.display = 'none';
+          }, 300);
+        }
+        currentUpdateInfo = null;
+      }
+
+      function showUpdateProgress() {
+        const progressSection = document.getElementById('update-progress-section');
+        const buttons = document.querySelector('.modal-buttons');
+
+        if (progressSection) progressSection.style.display = 'block';
+        if (buttons) buttons.style.display = 'none';
+      }
+
+      function updateDownloadProgress(progress) {
+        const progressFill = document.getElementById('update-progress-fill');
+        const progressText = document.getElementById('progress-percentage');
+
+        if (progressFill) {
+          progressFill.style.width = progress + '%';
+        }
+        if (progressText) {
+          progressText.textContent = progress + '%';
+        }
+      }
+      async function handleUpdateDownload() {
+        if (!currentUpdateInfo || isUpdating) return;
+
+        isUpdating = true;
+        showUpdateProgress();
+
+        const updateNowBtn = document.getElementById('update-now-btn');
+        if (updateNowBtn) {
+          updateNowBtn.disabled = true;
+          updateNowBtn.innerHTML = '<span class="btn-icon">⏳</span> Загрузка...';
+        }
+
+        try {
+          appendLog(`Начинается загрузка обновления ${currentUpdateInfo.version}`, 'info');
+
+          // Устанавливаем обработчик прогресса
+          let progressTimeout;
+          let lastProgressUpdate = Date.now();
+
+          window.electronAPI.onUpdateProgress((event, progress) => {
+            updateDownloadProgress(progress);
+            lastProgressUpdate = Date.now();
+
+            // Таймаут для обнаружения зависания
+            clearTimeout(progressTimeout);
+            progressTimeout = setTimeout(() => {
+              const timeSinceLastUpdate = Date.now() - lastProgressUpdate;
+              if (timeSinceLastUpdate > 30000 && progress < 100) { // 30 секунд без обновления
+                appendLog(`Возможное зависание на ${progress}%. Попробуйте позже.`, 'warning');
+              }
+            }, 30000);
+          });
+
+          const result = await window.electronAPI.downloadUpdate(
+            currentUpdateInfo.downloadUrl,
+            currentUpdateInfo.fileName
+          );
+
+          clearTimeout(progressTimeout);
+
+          if (result.success) {
+            appendLog('Обновление успешно установлено!', 'success');
+            showToast('Обновление установлено! Лаунчер будет перезапущен', 'success');
+
+            // Показываем сообщение об успешном обновлении
+            const progressSection = document.getElementById('update-progress-section');
+            if (progressSection) {
+              progressSection.innerHTML = `
+          <div class="update-success">
+            <div class="success-icon">✅</div>
+            <div class="success-message">Обновление установлено успешно!</div>
+            <div class="success-note">Лаунчер будет перезапущен автоматически</div>
+          </div>
+        `;
+            }
+
+          } else {
+            throw new Error(result.error || 'Неизвестная ошибка загрузки');
+          }
+        } catch (error) {
+          appendLog(`Ошибка загрузки обновления: ${error.message}`, 'error');
+          showToast(`Ошибка обновления: ${error.message}`, 'error');
+
+          // Восстанавливаем кнопку
+          if (updateNowBtn) {
+            updateNowBtn.disabled = false;
+            updateNowBtn.innerHTML = '<span class="btn-icon">⬇️</span> Обновить сейчас';
+          }
+
+          // Скрываем прогресс и показываем кнопки
+          const progressSection = document.getElementById('update-progress-section');
+          const buttons = document.querySelector('.modal-buttons');
+          if (progressSection) progressSection.style.display = 'none';
+          if (buttons) buttons.style.display = 'flex';
+
+        } finally {
+          isUpdating = false;
+        }
+      }
+      // Ручная проверка обновлений
+      async function checkForUpdatesManually() {
+        if (!window.electronAPI) {
+          showToast('Функция доступна только в приложении', 'error');
+          return;
+        }
+
+        try {
+          appendLog('Проверка обновлений...', 'info');
+          const result = await window.electronAPI.checkUpdates();
+
+          if (result.available) {
+            showUpdateModal(result);
+          } else {
+            showToast('У вас установлена последняя версия', 'success');
+            appendLog('Обновлений не найдено', 'info');
+          }
+        } catch (error) {
+          showToast(`Ошибка проверки обновлений: ${error.message}`, 'error');
+          appendLog(`Ошибка проверки обновлений: ${error.message}`, 'error');
+        }
+      }
+      function updateStatus(status, text) {
+        if (elements.statusDot) {
+          elements.statusDot.className = `status-dot ${status}`;
+        }
+        if (elements.statusText) {
+          elements.statusText.textContent = text;
+        }
+        if (elements.statusContainer) {
+          elements.statusContainer.className = 'status';
+          if (status === 'installing') {
+            elements.statusContainer.classList.add('installing');
+          } else if (status === 'offline') {
+            elements.statusContainer.classList.add('offline');
+          }
+        }
+      }
+
+      function updateButtonStates() {
+        if (elements.installBtn) elements.installBtn.classList.add('hidden');
+        if (elements.playBtn) elements.playBtn.classList.add('hidden');
+        if (elements.checkStatusBtn) elements.checkStatusBtn.classList.add('hidden');
+
+        if (isInstalling) {
+          if (elements.installBtn) {
+            elements.installBtn.disabled = true;
+            elements.installBtn.textContent = 'УСТАНОВКА...';
+            elements.installBtn.classList.remove('hidden');
+          }
+          updateStatus('installing', 'Установка...');
+        } else if (isPlaying) {
+          if (elements.playBtn) {
+            elements.playBtn.disabled = true;
+            elements.playBtn.textContent = 'ЗАПУСК...';
+            elements.playBtn.classList.remove('hidden');
+          }
+          updateStatus('installing', 'Запуск игры...');
+        } else {
+          if (elements.installBtn) {
+            elements.installBtn.disabled = false;
+            elements.installBtn.textContent = 'УСТАНОВИТЬ';
+          }
+          if (elements.playBtn) {
+            elements.playBtn.disabled = false;
+            elements.playBtn.textContent = 'ИГРАТЬ';
+          }
+
+          if (isClientInstalled) {
+            if (elements.playBtn) elements.playBtn.classList.remove('hidden');
+            if (elements.checkStatusBtn) elements.checkStatusBtn.classList.remove('hidden');
+            updateStatus('', 'Готов к игре');
+          } else {
+            if (elements.installBtn) elements.installBtn.classList.remove('hidden');
+            if (elements.checkStatusBtn) elements.checkStatusBtn.classList.remove('hidden');
+            updateStatus('offline', 'Клиент не установлен');
+          }
+        }
+      }
+
+      async function checkClientStatus() {
+        if (!isElectron || !electronAPI) {
+          appendLog('Проверка статуса доступна только в приложении', 'warning');
+          return;
+        }
+
+        appendLog('Проверка статуса клиента...', 'info');
+
+        try {
+          const status = await electronAPI.checkGameStatus();
+          clientStatus = status;
+          isClientInstalled = status.clientInstalled;
+
+          appendLog(`Статус клиента: ${isClientInstalled ? 'установлен' : 'не установлен'}`, 'info');
+
+          if (status.details) {
+            appendLog(`Подробности: Vanilla=${status.details.vanilla}, Fabric=${status.details.fabric}`, 'info');
+          }
+
+          if (status.error) {
+            appendLog(`Ошибка проверки: ${status.error}`, 'error');
+          }
+
+          updateButtonStates();
+
+        } catch (error) {
+          appendLog(`Ошибка проверки статуса: ${error.message}`, 'error');
+          isClientInstalled = false;
+          updateButtonStates();
+        }
+      }
+
+      function switchTab(tab) {
+        elements.tabContents.forEach(content => {
+          content.classList.remove('active');
+        });
+
+        const tabContent = document.getElementById(`${tab}-tab`);
+        if (tabContent) tabContent.classList.add('active');
+
+        elements.menuItems.forEach(item => {
+          item.classList.remove('active');
+          if (item.dataset.tab === tab) {
+            item.classList.add('active');
+          }
+        });
+      }
+
+      async function checkAuth() {
+        try {
+          if (isElectron && electronAPI) {
+            const user = await electronAPI.getCurrentUser();
+            if (user) {
+              setAuthenticatedUser(user);
+              return true;
+            }
+          }
+        } catch (error) {
+          appendLog('Ошибка проверки авторизации: ' + error.message, 'error');
+        }
+        return false;
+      }
+
+      function setAuthenticatedUser(user) {
+        isAuthenticated = true;
+        currentUser = user;
+
+        if (elements.loginModal) elements.loginModal.style.display = 'none';
+        if (elements.launcher) elements.launcher.style.display = 'flex';
+
+        if (elements.usernameDisplay) {
+          elements.usernameDisplay.textContent = user.username || 'Пользователь';
+        }
+        if (elements.userAccess) {
+          elements.userAccess.textContent = `Проходка: ${user.access || 'навсегда'}`;
+        }
+
+        appendLog(`Пользователь ${user.username} авторизован`, 'success');
+
+        setTimeout(() => {
+          checkClientStatus();
+        }, 500);
+      }
+
+      async function handleLogin() {
+        const username = elements.usernameInput?.value?.trim();
+        const password = elements.passwordInput?.value?.trim();
+
+        if (!username || !password) {
+          showToast('Введите логин и пароль', 'error');
+          return;
+        }
+
+        if (!/^[a-zA-Z0-9_]{3,16}$/.test(username)) {
+          showToast('Ник должен содержать 3-16 символов (a-z, 0-9, _)', 'error');
+          return;
+        }
+
+        try {
+          let authResult;
+
+          if (isElectron && electronAPI) {
+            authResult = await electronAPI.sendAuthRequest({ username, password });
+          } else {
+            const response = await fetch('http://95.79.192.194:3000/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ username, password })
+            });
+            authResult = await response.json();
+          }
+
+          if (authResult.success) {
+            showToast('Авторизация успешна', 'success');
+            setAuthenticatedUser({
+              username: authResult.username,
+              access: authResult.access
+            });
+          } else {
+            showToast(authResult.message || 'Ошибка авторизации', 'error');
+          }
+        } catch (error) {
+          appendLog('Ошибка авторизации: ' + error.message, 'error');
+          showToast('Ошибка соединения', 'error');
+        }
+      }
+
+      async function handleInstall() {
+        if (isInstalling || !isAuthenticated) return;
+
+        isInstalling = true;
+        updateButtonStates();
+
+        const options = {
+          version: '1.21.8',
+          maxMemory: elements.maxMemoryInput ? `${elements.maxMemoryInput.value}G` : '4G',
+          minMemory: elements.minMemorySelect ? elements.minMemorySelect.value : '2G',
+          javaPath: elements.javaPathInput?.value === '(Автоматически)' ? undefined : elements.javaPathInput?.value,
+          modpack: elements.versionSelect ? elements.versionSelect.value : 'ULTRA'
+        };
+
+        appendLog(`Запуск установки клиента версии ${options.version} с модпаком ${options.modpack}...`);
+
+        try {
+          if (!isElectron || !electronAPI) {
+            throw new Error('Функция доступна только в приложении');
+          }
+
+          const result = await electronAPI.installClient(options);
+          appendLog(`Установка завершена: ${result.message || 'Успешно'}`, 'success');
+
+          await checkClientStatus();
+
+          showToast('Клиент успешно установлен!', 'success');
+
+        } catch (error) {
+          appendLog(`Ошибка установки: ${error.message}`, 'error');
+          showToast(`Ошибка установки: ${error.message}`, 'error');
+        } finally {
+          isInstalling = false;
+          updateButtonStates();
+        }
+      }
+
+      async function handlePlay() {
+        if (isPlaying || !isAuthenticated) return;
+
+        if (!isClientInstalled) {
+          showToast('Сначала установите клиент', 'error');
+          return;
+        }
+
+        isPlaying = true;
+        updateButtonStates();
+
+        const version = elements.versionSelect ? elements.versionSelect.value.split('-')[0] : '1.21.8';
+        const options = {
+          version: version,
+          useAdmin: false,
+          maxMemory: elements.maxMemoryInput ? `${elements.maxMemoryInput.value}G` : '4G',
+          minMemory: elements.minMemorySelect ? elements.minMemorySelect.value : '2G',
+          javaPath: elements.javaPathInput?.value === '(Автоматически)' ? undefined : elements.javaPathInput?.value,
+          modpack: elements.versionSelect ? elements.versionSelect.value : 'ULTRA' // Передаем модпак
+        };
+
+        appendLog(`Запуск Minecraft ${options.version} для игрока ${currentUser?.username} с модпаком ${options.modpack}...`);
+
+        try {
+          if (!isElectron || !electronAPI) {
+            throw new Error('Функция доступна только в приложении');
+          }
+
+          const result = await electronAPI.launchMinecraft(options);
+          appendLog(`Minecraft запущен (PID: ${result.pid}) для игрока ${result.username}`, 'success');
+          showToast('Minecraft запущен!', 'success');
+
+          setTimeout(() => {
+            isPlaying = false;
+            updateButtonStates();
+          }, 5000);
+
+        } catch (error) {
+          appendLog(`Ошибка запуска: ${error.message}`, 'error');
+          showToast(`Ошибка запуска: ${error.message}`, 'error');
+          isPlaying = false;
+          updateButtonStates();
+        }
+      }
+
+      async function loadSettings() {
+        if (!isElectron || !electronAPI) return;
+
+        try {
+          const settings = await electronAPI.loadSettings();
+
+          if (settings) {
+            if (elements.maxMemoryInput) {
+              const memValue = parseInt(settings.maxMemory) || 4;
+              elements.maxMemoryInput.value = memValue;
+              if (elements.maxMemoryValue) {
+                elements.maxMemoryValue.textContent = `${memValue} GB`;
+              }
+            }
+            if (elements.minMemorySelect) {
+              elements.minMemorySelect.value = settings.minMemory || '2G';
+            }
+            if (elements.javaPathInput) {
+              elements.javaPathInput.value = settings.javaPath || '(Автоматически)';
+            }
+            if (elements.versionSelect && settings.modpack) {
+              elements.versionSelect.value = settings.modpack;
+              appendLog(`Загружен модпак: ${settings.modpack}`, 'info');
+            }
+            appendLog('Настройки загружены', 'success');
+          }
+        } catch (error) {
+          appendLog('Ошибка загрузки настроек: ' + error.message, 'error');
+        }
+      }
+
+      async function saveSettings() {
+        if (!isElectron || !electronAPI) return;
+
+        const settings = {
+          maxMemory: elements.maxMemoryInput ? `${elements.maxMemoryInput.value}G` : '4G',
+          minMemory: elements.minMemorySelect ? elements.minMemorySelect.value : '2G',
+          javaPath: elements.javaPathInput ? elements.javaPathInput.value : '(Автоматически)',
+          modpack: elements.versionSelect ? elements.versionSelect.value : 'ULTRA'
+        };
+
+        try {
+          await electronAPI.saveSettings(settings);
+          appendLog('Настройки сохранены', 'success');
+          showToast('Настройки успешно сохранены!');
+        } catch (error) {
+          appendLog(`Ошибка сохранения настроек: ${error.message}`, 'error');
+          showToast(`Ошибка сохранения: ${error.message}`, 'error');
+        }
+      }
+
+      async function getAppInfo() {
+        if (!isElectron || !electronAPI) return;
+
+        try {
+          const version = await electronAPI.getAppVersion();
+          appendLog(`Версия лаунчера: ${version}`);
+          const versionElement = document.querySelector('.version-info');
+          if (versionElement) {
+            versionElement.textContent = `Лаунчер v${version}`;
+          }
+        } catch (error) {
+          appendLog('Не удалось получить версию лаунчера', 'warning');
+        }
+      }
+
+      function setupJavaPathHandler() {
+        if (elements.selectJavaPathBtn) {
+          elements.selectJavaPathBtn.addEventListener('click', async () => {
+            if (!isElectron || !electronAPI) {
+              showToast('Функция доступна только в приложении', 'error');
+              return;
+            }
+
+            try {
+              const result = await electronAPI.selectJavaPath();
+              if (result.filePaths && result.filePaths.length > 0 && elements.javaPathInput) {
+                elements.javaPathInput.value = result.filePaths[0];
+                appendLog(`Выбран путь к Java: ${result.filePaths[0]}`);
+              }
+            } catch (error) {
+              appendLog(`Ошибка выбора Java: ${error.message}`, 'error');
+            }
+          });
+        }
+      }
+
+      function setupExitHandler() {
+        if (elements.exitBtn) {
+          elements.exitBtn.addEventListener('click', async () => {
+            if (isInstalling || isPlaying) {
+              const shouldExit = confirm('Операция в процессе. Вы уверены, что хотите выйти?');
+              if (!shouldExit) return;
+            }
+
+            appendLog('Выход из приложения...');
+            if (isElectron && electronAPI) {
+              await electronAPI.quitApp();
+            } else {
+              window.close();
+            }
+          });
+        }
+      }
+
+      function setupEventListeners() {
+        if (elements.loginButton) {
+          elements.loginButton.addEventListener('click', handleLogin);
+        }
+
+        if (elements.installBtn) {
+          elements.installBtn.addEventListener('click', handleInstall);
+        }
+
+        if (elements.playBtn) {
+          elements.playBtn.addEventListener('click', handlePlay);
+        }
+
+        if (elements.checkStatusBtn) {
+          elements.checkStatusBtn.addEventListener('click', checkClientStatus);
+        }
+
+        setupJavaPathHandler();
+        setupExitHandler();
+
+        elements.menuItems.forEach(item => {
+          item.addEventListener('click', () => {
+            const tab = item.dataset.tab;
+            if (tab) switchTab(tab);
+          });
+        });
+
+        if (elements.maxMemoryInput) {
+          elements.maxMemoryInput.addEventListener('input', () => {
+            const value = parseInt(elements.maxMemoryInput.value);
+            if (elements.maxMemoryValue) {
+              elements.maxMemoryValue.textContent = `${value} GB`;
+            }
+            appendLog(`Максимальная память: ${value} GB`);
+          });
+        }
+
+        if (elements.saveSettingsBtn) {
+          elements.saveSettingsBtn.addEventListener('click', saveSettings);
+        }
+
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'F5') {
+            event.preventDefault();
+            if (isAuthenticated) {
+              checkClientStatus();
+              showToast('Статус обновлен', 'info');
+            }
+          }
+
+          if (event.key === 'Enter' && elements.loginModal.style.display !== 'none') {
+            handleLogin();
+          }
+        });
+
+        window.addEventListener('beforeunload', (event) => {
+          if (isInstalling || isPlaying) {
+            event.preventDefault();
+            event.returnValue = '';
+          }
+        });
+      }
+
+      function setupIpcListeners() {
+        if (!isElectron || !electronAPI) return;
+
+        if (window.electronAPI && window.electronAPI.onLogMessage) {
+          window.electronAPI.onLogMessage((message, type) => {
+            appendLog(message, type);
+          });
+        }
+
+        if (window.electronAPI && window.electronAPI.onInstallationStatus) {
+          window.electronAPI.onInstallationStatus((status) => {
+            clientStatus = status;
+            isClientInstalled = status.clientInstalled;
+            appendLog(`Статус обновлен: ${isClientInstalled ? 'установлен' : 'не установлен'}`);
+            updateButtonStates();
+          });
+        }
+      }
+
+      async function initialize() {
+        appendLog('=== SHAMPUNEUM LAUNCHER ===');
+        appendLog(`Запущен в режиме: ${isElectron ? 'Electron приложение' : 'Браузер (демо)'}`);
+
+        if (isElectron) {
+          await getAppInfo();
+          await loadSettings();
+          setupIpcListeners();
+        } else {
+          appendLog('Некоторые функции недоступны в браузере', 'warning');
+        }
+
+        const isAuth = await checkAuth();
+        if (!isAuth) {
+          if (elements.loginModal) elements.loginModal.style.display = 'flex';
+          if (elements.launcher) elements.launcher.style.display = 'none';
+          updateStatus('offline', 'Не авторизован');
+        } else {
+          setTimeout(() => {
+            checkClientStatus();
+          }, 1000);
+        }
+
+        appendLog('Готов к работе!', 'success');
+      }
+
+      document.addEventListener('DOMContentLoaded', async () => {
+        setupEventListeners();
+        setupUpdateHandlers();
+        setTimeout(async () => {
+          const loader = document.querySelector('.loader');
+          if (loader) loader.style.display = 'none';
+
+          if (!isElectron) {
+            appendLog('Запущен в браузере - демо-режим');
+          }
+
+          await initialize();
+        }, 1500);
+      });
+      if (typeof window !== 'undefined') {
+        window.launcherAPI = {
+          showToast,
+          appendLog,
+          checkClientStatus,
+          isAuthenticated: () => isAuthenticated,
+          getCurrentUser: () => currentUser,
+          getClientStatus: () => clientStatus
+        };
+      }
+    })();
+  </script>
+</body>
+
+</html>
