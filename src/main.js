@@ -33,7 +33,8 @@ function createWindow() {
     resizable: true,
     minWidth: 1200,
     minHeight: 800,
-    icon: path.join(__dirname, "assets", "icon.png"),
+    autoHideMenuBar: false,
+    icon: path.join(__dirname, "renderer/images/ico.ico"),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,

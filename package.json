@@ -1,6 +1,6 @@
 {
   "name": "shampuneum-launcher",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Shampuneum Minecraft Launcher",
   "main": "src/main.js",
   "scripts": {
@@ -40,11 +40,11 @@
           ]
         }
       ],
-      "icon": "assets/icon.ico",
-      "artifactName": "${productName}-${version}-${arch}.${ext}"
+      "icon": "src/renderer/images/ico.ico",
+      "artifactName": "new-shampuneum-launcher.${ext}"
     },
     "portable": {
-      "artifactName": "${productName}-${version}-portable.${ext}"
+      "artifactName": "new-shampuneum-launcher.${ext}"
     },
     "publish": {
       "provider": "github",
@@ -57,7 +57,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/твой-username/shampuneum-launcher.git"
+    "url": "https://github.com/LoLeNNNN/shampuneum-launcher.git"
   },
   "keywords": [
     "minecraft",
@@ -65,11 +65,10 @@
     "shampuneum",
     "electron"
   ],
-  "author": "Твоё имя",
+  "author": "Brokolnn",
   "license": "MIT",
   "dependencies": {
     "adm-zip": "^0.5.10",
-    "electron-updater": "^6.1.1",
     "fs-extra": "^11.3.0",
     "minecraft-launcher-core": "^3.18.2",
     "node-fetch": "^2.6.7"

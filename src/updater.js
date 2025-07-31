@@ -68,7 +68,6 @@ class LauncherUpdater {
 
                 const latestVersion = release.tag_name.replace(/^v/, "");
 
-                // Проверка пропущенной версии
                 const configPath = path.join(
                   os.homedir(),
                   "AppData",
@@ -199,225 +198,208 @@ class LauncherUpdater {
   }
 
   async downloadAndInstall(downloadUrl, fileName, retries = 3) {
-  return new Promise(async (resolve, reject) => {
-    for (let attempt = 1; attempt <= retries; attempt++) {
-      try {
-        const tempDir = path.join(os.tmpdir(), "shampuneum-updater");
-        if (!fs.existsSync(tempDir)) {
-          fs.mkdirSync(tempDir, { recursive: true });
-        }
-        const filePath = path.join(tempDir, fileName);
-
-        this.mainWindow.webContents.send("log-message", {
-          message: `Попытка загрузки ${attempt}/${retries}...`,
-          type: "info",
-        });
-
-        // Более строгие заголовки для GitHub API
-        const response = await fetch(downloadUrl, {
-          headers: {
-            "User-Agent": "Shampuneum-Launcher/1.0",
-            "Accept": "application/octet-stream",
-            "Cache-Control": "no-cache"
-          },
-          timeout: 300000, // 5 минут таймаут
-        });
-
-        if (!response.ok) {
-          throw new Error(
-            `HTTP error: ${response.status} ${response.statusText}`
-          );
-        }
-
-        const contentLength = parseInt(
-          response.headers.get("content-length"),
-          10
-        );
-        let downloadedBytes = 0;
-        let lastProgressTime = Date.now();
-        let lastDownloadedBytes = 0;
-
-        // Создаем файл для записи
-        const fileStream = fs.createWriteStream(filePath);
-        
-        // Обработка потока с контролем скорости
-        const reader = response.body.getReader();
-        
-        const pump = async () => {
-          try {
-            while (true) {
-              const { done, value } = await reader.read();
-              
-              if (done) break;
-              
-              downloadedBytes += value.length;
-              fileStream.write(value);
-
-              // Обновляем прогресс не чаще чем раз в секунду
-              const now = Date.now();
-              if (now - lastProgressTime >= 1000) {
-                const speed = (downloadedBytes - lastDownloadedBytes) / ((now - lastProgressTime) / 1000);
-                const progress = contentLength ? Math.round((downloadedBytes / contentLength) * 100) : 0;
-                
-                console.log(`Download progress: ${progress}% (${this.formatBytes(downloadedBytes)}/${this.formatBytes(contentLength)}) - ${this.formatBytes(speed)}/s`);
-                
-                this.mainWindow.webContents.send("log-message", {
-                  message: `Загружено: ${progress}% (${this.formatBytes(speed)}/s)`,
-                  type: "info",
-                });
-
-                if (this.onDownloadProgress) {
-                  this.onDownloadProgress(progress);
-                }
-
-                lastProgressTime = now;
-                lastDownloadedBytes = downloadedBytes;
-              }
-
-              // Небольшая пауза для предотвращения блокировки UI
-              if (downloadedBytes % (1024 * 1024) === 0) { // Каждый MB
-                await new Promise(resolve => setTimeout(resolve, 10));
-              }
-            }
-          } catch (error) {
-            fileStream.destroy();
-            throw error;
+    return new Promise(async (resolve, reject) => {
+      for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+          // Создаем временную папку для загрузки
+          const tempDir = path.join(os.tmpdir(), "shampuneum-updater");
+          if (!fs.existsSync(tempDir)) {
+            fs.mkdirSync(tempDir, { recursive: true });
           }
-        };
-
-        await pump();
-        
-        // Закрываем поток записи и ждем завершения
-        await new Promise((resolveStream, rejectStream) => {
-          fileStream.end();
-          fileStream.on('finish', resolveStream);
-          fileStream.on('error', rejectStream);
-        });
-
-        this.mainWindow.webContents.send("log-message", {
-          message: `Загрузка завершена: ${this.formatBytes(downloadedBytes)}`,
-          type: "success",
-        });
-
-        // Проверяем целостность файла
-        if (contentLength && downloadedBytes !== contentLength) {
-          throw new Error(`Неполная загрузка: получено ${downloadedBytes} из ${contentLength} байт`);
-        }
-
-        // Проверяем, что файл действительно создан и не пустой
-        if (!fs.existsSync(filePath) || fs.statSync(filePath).size === 0) {
-          throw new Error("Загруженный файл поврежден или пустой");
-        }
-
-        // Продолжаем с установкой...
-        const appPath = path.dirname(process.execPath);
-        const isPortable = fileName.toLowerCase().includes("portable");
-
-        if (fileName.toLowerCase().endsWith(".exe")) {
-          const newExePath = path.join(appPath, fileName);
-          const batPath = path.join(tempDir, "update.bat");
-          const currentExeName = path.basename(process.execPath);
-          
-          const batContent = `
-@echo off
-echo Ожидание завершения процесса лаунчера...
-timeout /t 5 /nobreak > nul
-echo Удаление старой версии...
-if exist "${currentExeName}" del "${currentExeName}"
-echo Установка новой версии...
-if exist "${fileName}" (
-  ren "${fileName}" "${currentExeName}"
-  echo Запуск обновленного лаунчера...
-  start "" "${currentExeName}"
-) else (
-  echo Ошибка: файл обновления не найден
-)
-echo Очистка временных файлов...
-del "%~f0"
-          `.trim();
-
-          await fs.writeFile(batPath, batContent);
-          await fs.copy(filePath, newExePath);
+          const filePath = path.join(tempDir, fileName);
+          const logPath = path.join(tempDir, "update_log.txt");
 
           this.mainWindow.webContents.send("log-message", {
-            message: "Обновление установлено, перезапуск...",
+            message: `Попытка загрузки ${attempt}/${retries}...`,
+            type: "info",
+          });
+
+          // Проверяем права доступа к временной папке
+          try {
+            fs.accessSync(tempDir, fs.constants.W_OK);
+          } catch (error) {
+            throw new Error(`Нет прав на запись в ${tempDir}: ${error.message}`);
+          }
+
+          // Загружаем файл
+          const response = await fetch(downloadUrl, {
+            headers: {
+              "User-Agent": "Shampuneum-Launcher/1.0",
+              Accept: "application/octet-stream",
+              "Cache-Control": "no-cache",
+            },
+            timeout: 120000, // 2 минуты таймаут
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error: ${response.status} ${response.statusText}`);
+          }
+
+          const contentLength = parseInt(response.headers.get("content-length"), 10);
+          let downloadedBytes = 0;
+
+          // Создаем поток для записи файла
+          const fileStream = fs.createWriteStream(filePath);
+
+          // Обработка потока загрузки
+          await new Promise((resolveStream, rejectStream) => {
+            response.body.pipe(fileStream);
+
+            response.body.on("error", (error) => {
+              fileStream.destroy();
+              rejectStream(error);
+            });
+
+            fileStream.on("finish", () => {
+              downloadedBytes = fs.statSync(filePath).size;
+              resolveStream();
+            });
+
+            fileStream.on("error", (error) => {
+              rejectStream(error);
+            });
+          });
+
+          this.mainWindow.webContents.send("log-message", {
+            message: `Загрузка завершена: ${this.formatBytes(downloadedBytes)}`,
             type: "success",
           });
 
-          exec(`start "" "${batPath}"`, {
-            cwd: appPath,
-            detached: true,
-            shell: true,
-          });
+          // Проверка целостности файла
+          if (contentLength && downloadedBytes !== contentLength) {
+            throw new Error(`Неполная загрузка: получено ${downloadedBytes} из ${contentLength} байт`);
+          }
 
-          // Даем время батнику запуститься перед выходом
-          setTimeout(() => {
-            app.quit();
-          }, 2000);
-          
-          resolve({ success: true });
-        } else if (fileName.toLowerCase().endsWith(".zip")) {
+          if (!fs.existsSync(filePath) || fs.statSync(filePath).size === 0) {
+            throw new Error("Загруженный файл поврежден или пустой");
+          }
+
+          const appPath = path.dirname(process.execPath);
+          const currentExePath = process.execPath;
+          const targetExeName = "shampuneum-launcher.exe";
+          const targetExePath = path.join(appPath, targetExeName);
+
+          // Проверяем права доступа к папке приложения
           try {
-            const AdmZip = require("adm-zip");
-            const zip = new AdmZip(filePath);
-            const extractPath = path.join(tempDir, "extracted");
-            
-            this.mainWindow.webContents.send("log-message", {
-              message: "Извлечение архива...",
-              type: "info",
-            });
-            
-            zip.extractAllTo(extractPath, true);
+            fs.accessSync(appPath, fs.constants.W_OK);
+          } catch (error) {
+            throw new Error(`Нет прав на запись в ${appPath}: ${error.message}`);
+          }
 
-            await fs.copy(extractPath, appPath, {
-              overwrite: true,
-              preserveTimestamps: false,
-            });
+          if (fileName.toLowerCase().endsWith(".exe")) {
+            // Создаем батник для обновления
+            const batPath = path.join(tempDir, "update.bat");
+            const batContent = `
+@echo off
+echo Начало обновления... >> "${logPath}"
+echo Новый файл: ${filePath} >> "${logPath}"
+echo Целевой файл: ${targetExePath} >> "${logPath}"
+taskkill /IM "${targetExeName}" /F >> "${logPath}" 2>&1
+copy "${filePath}" "${appPath}\\new-shampuneum-launcher.exe" >> "${logPath}" 2>&1
+if exist "${appPath}\\new-shampuneum-launcher.exe" (
+  del "${targetExePath}" >> "${logPath}" 2>&1
+  ren "${appPath}\\new-shampuneum-launcher.exe" "${targetExeName}" >> "${logPath}" 2>&1
+  if exist "${targetExePath}" (
+    echo Успешно обновлено >> "${logPath}"
+    start "" "${targetExePath}"
+    del "${filePath}" >> "${logPath}" 2>&1
+    del "%~f0" >> "${logPath}" 2>&1
+  ) else (
+    echo Ошибка: Не удалось переименовать файл >> "${logPath}"
+    exit /b 1
+  )
+) else (
+  echo Ошибка: Не удалось скопировать новый файл >> "${logPath}"
+  exit /b 1
+)
+`;
+
+            await fs.writeFile(batPath, batContent, "utf8");
+
+            // Проверяем, что батник создался
+            if (!fs.existsSync(batPath)) {
+              throw new Error(`Не удалось создать батник: ${batPath}`);
+            }
 
             this.mainWindow.webContents.send("log-message", {
-              message: "Обновление установлено! Перезапустите приложение",
+              message: `Батник создан: ${batPath}`,
               type: "success",
             });
 
+            // Запускаем батник
+            const command = `start /B cmd /c "${batPath}"`;
+            exec(command, (error) => {
+              if (error) {
+                console.error("Ошибка запуска батника:", error);
+                this.mainWindow.webContents.send("log-message", {
+                  message: `Ошибка запуска батника: ${error.message}`,
+                  type: "error",
+                });
+              }
+            });
+
+            // Закрываем приложение
+            setTimeout(() => {
+              app.quit();
+            }, 1000);
+
             resolve({ success: true });
-          } catch (zipError) {
-            throw new Error(`Ошибка извлечения архива: ${zipError.message}`);
+          } else if (fileName.toLowerCase().endsWith(".zip")) {
+            try {
+              const AdmZip = require("adm-zip");
+              const zip = new AdmZip(filePath);
+              const extractPath = path.join(tempDir, "extracted");
+
+              this.mainWindow.webContents.send("log-message", {
+                message: "Извлечение архива...",
+                type: "info",
+              });
+
+              zip.extractAllTo(extractPath, true);
+
+              await fs.copy(extractPath, appPath, {
+                overwrite: true,
+                preserveTimestamps: false,
+              });
+
+              this.mainWindow.webContents.send("log-message", {
+                message: "Обновление установлено! Перезапустите приложение",
+                type: "success",
+              });
+
+              resolve({ success: true });
+            } catch (zipError) {
+              throw new Error(`Ошибка извлечения архива: ${zipError.message}`);
+            }
+          } else {
+            throw new Error(`Неподдерживаемый тип файла: ${fileName}`);
           }
-        } else {
-          throw new Error(`Неподдерживаемый тип файла: ${fileName}`);
-        }
-        break;
-        
-      } catch (error) {
-        this.mainWindow.webContents.send("log-message", {
-          message: `Попытка ${attempt} не удалась: ${error.message}`,
-          type: "error",
-        });
-        
-        // Очищаем поврежденный файл
-        try {
-          const filePath = path.join(os.tmpdir(), "shampuneum-updater", fileName);
-          if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
+          break;
+        } catch (error) {
+          this.mainWindow.webContents.send("log-message", {
+            message: `Попытка ${attempt} не удалась: ${error.message}`,
+            type: "error",
+          });
+
+          // Очищаем поврежденный файл
+          try {
+            if (fs.existsSync(filePath)) {
+              fs.unlinkSync(filePath);
+            }
+          } catch (cleanupError) {
+            console.error("Ошибка очистки:", cleanupError);
           }
-        } catch (cleanupError) {
-          console.error("Ошибка очистки:", cleanupError);
+
+          if (attempt === retries) {
+            reject(new Error(`Не удалось загрузить после ${retries} попыток: ${error.message}`));
+          }
+
+          await new Promise((resolve) => setTimeout(resolve, attempt * 2000));
         }
-        
-        if (attempt === retries) {
-          reject(
-            new Error(
-              `Не удалось загрузить после ${retries} попыток: ${error.message}`
-            )
-          );
-        }
-        
-        // Увеличиваем задержку между попытками
-        await new Promise((resolve) => setTimeout(resolve, attempt * 3000));
       }
-    }
-  });
-}
+    });
+  }
+
   parseChangelog(markdown) {
     if (!markdown) return "Информация об изменениях недоступна";
 
