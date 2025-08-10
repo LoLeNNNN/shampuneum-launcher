@@ -279,7 +279,6 @@ class LauncherUpdater {
           const targetExeName = "shampuneum-launcher.exe";
           const targetExePath = path.join(appPath, targetExeName);
 
-          // Проверяем права доступа к папке приложения
           try {
             fs.accessSync(appPath, fs.constants.W_OK);
           } catch (error) {
@@ -287,7 +286,6 @@ class LauncherUpdater {
           }
 
           if (fileName.toLowerCase().endsWith(".exe")) {
-            // Создаем батник для обновления
             const batPath = path.join(tempDir, "update.bat");
             const batContent = `
 @echo off
@@ -316,7 +314,6 @@ if exist "${appPath}\\new-shampuneum-launcher.exe" (
 
             await fs.writeFile(batPath, batContent, "utf8");
 
-            // Проверяем, что батник создался
             if (!fs.existsSync(batPath)) {
               throw new Error(`Не удалось создать батник: ${batPath}`);
             }

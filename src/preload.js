@@ -44,5 +44,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // События обновлений
   onUpdateAvailable: (callback) => ipcRenderer.on('update-available', callback),
   onUpdateProgress: (callback) => ipcRenderer.on('update-progress', callback),
-  onUpdateStatus: (callback) => ipcRenderer.on('update-status', callback)
+  onUpdateStatus: (callback) => ipcRenderer.on('update-status', callback),
+
+  // Проверка ОС
+  checkSystemJava: () => ipcRenderer.invoke('check-system-java'),
+  getSystemInfo: () => ipcRenderer.invoke('get-system-info')
 });

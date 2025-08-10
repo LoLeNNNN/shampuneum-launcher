@@ -310,7 +310,33 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 });
+ipcMain.handle('check-system-java', async () => {
+  const { exec } = require('child_process');
+  const util = require('util');
+  const execPromise = util.promisify(exec);
 
+  try {
+    const { stdout, stderr } = await execPromise('java -version');
+    const versionOutput = stdout + stderr;
+    const versionMatch = versionOutput.match(/version\s+"?(\d+)(\.\d+\.\d+)?/);
+
+    if (versionMatch) {
+      return {
+        version: parseInt(versionMatch[1]),
+        path: 'java'
+      };
+    }
+  } catch (error) {
+    return null;
+  }
+});
+
+ipcMain.handle('get-system-info', async () => {
+  const os = require('os');
+  return {
+    totalMemory: Math.floor(os.totalmem() / (1024 * 1024 * 1024))
+  };
+});
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
 });

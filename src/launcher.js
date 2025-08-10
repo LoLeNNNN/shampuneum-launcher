@@ -56,11 +56,23 @@ function launchMinecraft(username, options = {}) {
       return;
     }
 
-    const javaPath = options.javaPath && options.javaPath !== "(Автоматически)" 
-      ? options.javaPath 
-      : javaDefaultPath;
+    let javaPath;
+    
+    if (options.javaPath && options.javaPath !== "(Автоматически)") {
+      if (options.javaPath === "java" || options.javaPath.includes("Системная Java")) {
+        javaPath = os.platform() === "win32" ? "javaw" : "java";
+      } else {
+        javaPath = options.javaPath;
+      }
+    } else {
+      if (fs.existsSync(javaDefaultPath)) {
+        javaPath = javaDefaultPath;
+      } else {
+        javaPath = os.platform() === "win32" ? "javaw" : "java";
+      }
+    }
 
-    if (!fs.existsSync(javaPath)) {
+    if (javaPath !== "java" && javaPath !== "javaw" && !fs.existsSync(javaPath)) {
       reject(new Error(`Java не найдена по пути: ${javaPath}. Переустановите клиент.`));
       return;
     }
@@ -80,7 +92,7 @@ function launchMinecraft(username, options = {}) {
         custom: fabricVersion,
       },
       memory: {
-        max: options.maxMemory || "4G",
+        max: options.maxMemory || "8G",
         min: options.minMemory || "2G",
       },
       forge: false,
@@ -113,6 +125,7 @@ function launchMinecraft(username, options = {}) {
           username: username,
           version: version,
           isFabric: !!versionConfig.fabric,
+          javaPath: javaPath,
         });
       })
       .catch(reject);

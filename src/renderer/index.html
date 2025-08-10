@@ -92,7 +92,6 @@
     <div class="sidebar">
       <div class="avatar">
         <img src="images/image-44.png" alt="User Avatar">
-        <div class="update-badge" id="update-badge">1</div>
       </div>
       <ul class="nav">
         <li class="menu-item active" data-tab="home">
@@ -181,55 +180,133 @@
           <h2>НАСТРОЙКИ</h2>
           <p>Настройте параметры лаунчера и игры для оптимального опыта.</p>
 
-          <div class="form-group">
-            <label for="max-memory">
-              Максимальная память (ГБ):
-              <span class="tooltip">?
-                <span class="tooltip-text">Рекомендуется выделять не более 70% от общей оперативной памяти</span>
-              </span>
-            </label>
-            <div class="memory-control">
-              <input type="range" id="max-memory" min="1" max="16" value="4" style="width: 100%;">
-              <span id="max-memory-value">4 GB</span>
+          <!-- Настройки памяти -->
+          <div class="settings-section">
+            <h3>Управление памятью</h3>
+
+            <div class="form-group">
+              <label for="max-memory">
+                Максимальная память:
+                <span class="tooltip">?
+                  <span class="tooltip-text">Максимальный объем ОЗУ, выделяемый для Minecraft</span>
+                </span>
+              </label>
+              <div class="memory-slider-container">
+                <input type="range" id="max-memory" min="2" max="16" value="4" class="memory-slider">
+                <div class="memory-display">
+                  <span id="max-memory-value">4 GB</span>
+                  <span class="memory-percentage" id="memory-percentage"></span>
+                </div>
+              </div>
+              <div class="system-memory-info" id="memory-system-info">
+                <!-- Здесь будет информация о системной памяти -->
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="min-memory">
+                Минимальная память:
+                <span class="tooltip">?
+                  <span class="tooltip-text">Начальный объем памяти при запуске</span>
+                </span>
+              </label>
+              <select id="min-memory" class="settings-select">
+                <option value="1G">1 GB</option>
+                <option value="2G" selected>2 GB</option>
+                <option value="3G">3 GB</option>
+                <option value="4G">4 GB</option>
+              </select>
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="min-memory">
-              Минимальная память (ГБ):
-              <span class="tooltip">?
-                <span class="tooltip-text">Минимальный объем памяти, выделяемый при запуске</span>
-              </span>
-            </label>
-            <select id="min-memory" class="controls-select">
-              <option value="1G">1 GB</option>
-              <option value="2G" selected>2 GB</option>
-              <option value="3G">3 GB</option>
-              <option value="4G">4 GB</option>
-            </select>
-          </div>
+          <!-- Настройки Java -->
+          <div class="settings-section">
+            <h3>Настройки Java</h3>
 
-          <div class="form-group">
-            <label for="java-path">
-              Путь к Java:
-              <span class="tooltip">?
-                <span class="tooltip-text">Оставьте "Автоматически" для использования системной Java</span>
-              </span>
-            </label>
-            <div class="java-path-group">
-              <input type="text" id="java-path" value="(Автоматически)" readonly>
-              <button id="select-java-path" class="play-btn"
-                style="padding: 10px 20px; font-size: 14px;">Выбрать</button>
+            <div class="form-group">
+              <label for="java-path">
+                Путь к Java:
+                <span class="tooltip">?
+                  <span class="tooltip-text">Лаунчер автоматически определит лучшую версию Java</span>
+                </span>
+              </label>
+              <div class="java-path-container">
+                <input type="text" id="java-path" value="(Автоматически)" readonly class="java-path-input">
+                <button id="select-java-path" class="secondary-btn">Выбрать</button>
+              </div>
+              <div class="java-status" id="java-status">
+                <!-- Здесь будет статус Java -->
+              </div>
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="launch-options">//todo Дополнительные параметры запуска</label>
-            <textarea id="launch-options" rows="3"
-              style="width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #2c3a45; background-color: #1e2a33; color: var(--text-light); resize: vertical;"></textarea>
+          <!-- Настройки производительности -->
+          <div class="settings-section">
+            <h3>Производительность</h3>
+
+            <div class="form-group">
+              <label>
+                Приоритет процесса:
+                <span class="tooltip">?
+                  <span class="tooltip-text">Высокий приоритет может улучшить производительность</span>
+                </span>
+              </label>
+              <div class="checkbox-container">
+                <input type="checkbox" id="high-priority" class="settings-checkbox">
+                <label for="high-priority" class="checkbox-label">Высокий приоритет</label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>
+                Оптимизация сборщика мусора:
+                <span class="tooltip">?
+                  <span class="tooltip-text">Улучшает производительность за счет оптимизации работы с памятью</span>
+                </span>
+              </label>
+              <div class="checkbox-container">
+                <input type="checkbox" id="gc-optimization" class="settings-checkbox" checked>
+                <label for="gc-optimization" class="checkbox-label">Включить оптимизацию GC</label>
+              </div>
+            </div>
           </div>
 
-          <button id="save-settings" class="play-btn">Сохранить настройки</button>
+          <!-- Настройки лаунчера -->
+          <div class="settings-section">
+            <h3>Настройки лаунчера</h3>
+
+            <div class="form-group">
+              <label>
+                Автообновления:
+                <span class="tooltip">?
+                  <span class="tooltip-text">Автоматически проверять и устанавливать обновления</span>
+                </span>
+              </label>
+              <div class="checkbox-container">
+                <input type="checkbox" id="auto-updates" class="settings-checkbox" checked>
+                <label for="auto-updates" class="checkbox-label">Автоматические обновления</label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>
+                Закрытие лаунчера:
+                <span class="tooltip">?
+                  <span class="tooltip-text">Закрывать лаунчер после запуска игры</span>
+                </span>
+              </label>
+              <div class="checkbox-container">
+                <input type="checkbox" id="close-launcher" class="settings-checkbox">
+                <label for="close-launcher" class="checkbox-label">Закрывать после запуска</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-actions">
+            <button id="save-settings" class="play-btn">Сохранить настройки</button>
+            <button id="reset-settings" class="secondary-btn">Сбросить</button>
+            <button id="check-updates-manual" class="secondary-btn">Проверить обновления</button>
+          </div>
         </div>
       </div>
 
@@ -248,4 +325,5 @@
   </div>
   <script src=scripts.js></script>
 </body>
+
 </html>

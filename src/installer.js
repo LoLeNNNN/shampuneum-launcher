@@ -62,9 +62,14 @@ async function checkJavaVersion(javaPath, sendLogToRenderer) {
       sendLogToRenderer("Не удалось определить версию Java", "error");
       return false;
     }
+
     const majorVersion = parseInt(versionMatch[1]);
-    sendLogToRenderer(`Обнаружена Java версии ${majorVersion}`, "info");
-    return majorVersion >= 21;
+    const isCompatible = majorVersion >= 21;
+
+    sendLogToRenderer(`Обнаружена Java версии ${majorVersion} ${isCompatible ? '(совместима)' : '(несовместима, нужна 21+)'}`,
+      isCompatible ? "success" : "warning");
+
+    return isCompatible;
   } catch (error) {
     sendLogToRenderer(`Ошибка проверки Java: ${error.message}`, "error");
     return false;
@@ -74,21 +79,38 @@ async function checkJavaVersion(javaPath, sendLogToRenderer) {
 async function downloadJava(sendLogToRenderer) {
   const platform = os.platform();
   const javaUrl = JAVA_DOWNLOAD_URLS[platform];
+
   if (!javaUrl) {
     sendLogToRenderer(`Платформа ${platform} не поддерживается`, "error");
     throw new Error(`Платформа не поддерживается: ${platform}`);
   }
 
-  ensureDirectoryExists(javaRoot);
-  const javaArchivePath = path.join(javaRoot, `jdk-24.${platform === 'win32' ? 'zip' : 'tar.gz'}`);
-  const javaExtractPath = path.join(javaRoot, "jdk-24.0.2");
+  try {
+    const { stdout, stderr } = await execPromise('java -version');
+    const versionMatch = (stdout + stderr).match(/version\s+"?(\d+)(\.\d+\.\d+)?/);
 
+    if (versionMatch) {
+      const majorVersion = parseInt(versionMatch[1]);
+      if (majorVersion >= 21) {
+        sendLogToRenderer(`Используется системная Java ${majorVersion}`, "success");
+        return 'java'; 
+      } else {
+        sendLogToRenderer(`Системная Java ${majorVersion} устарела, устанавливаем Java 24`, "info");
+      }
+    }
+  } catch (error) {
+    sendLogToRenderer("Системная Java не найдена, устанавливаем Java 24", "info");
+  }
+
+  ensureDirectoryExists(javaRoot);
   if (fs.existsSync(javaDefaultPath)) {
     if (await checkJavaVersion(javaDefaultPath, sendLogToRenderer)) {
-      sendLogToRenderer("Java 21+ уже установлена", "info");
+      sendLogToRenderer("Java 24 уже установлена", "info");
       return javaDefaultPath;
     }
   }
+
+  const javaArchivePath = path.join(javaRoot, `jdk-24.${platform === 'win32' ? 'zip' : 'tar.gz'}`);
 
   sendLogToRenderer("Скачивание Java 24...", "info");
   await downloadFile(javaUrl, javaArchivePath);
@@ -111,6 +133,7 @@ async function downloadJava(sendLogToRenderer) {
     sendLogToRenderer("Java 24 успешно установлена", "success");
     return javaDefaultPath;
   }
+
   throw new Error("Не удалось установить подходящую версию Java");
 }
 
@@ -128,7 +151,7 @@ function downloadFile(url, filePath, redirectCount = 0) {
       .get(url, (response) => {
         if (response.statusCode >= 300 && response.statusCode < 400 && response.headers.location) {
           file.close();
-          fs.unlink(filePath, () => {});
+          fs.unlink(filePath, () => { });
           const newUrl = response.headers.location.startsWith("http")
             ? response.headers.location
             : new URL(response.headers.location, url).href;
@@ -140,7 +163,7 @@ function downloadFile(url, filePath, redirectCount = 0) {
 
         if (response.statusCode !== 200) {
           file.close();
-          fs.unlink(filePath, () => {});
+          fs.unlink(filePath, () => { });
           reject(new Error(`HTTP ${response.statusCode}: ${url}`));
           return;
         }
@@ -159,13 +182,13 @@ function downloadFile(url, filePath, redirectCount = 0) {
         });
 
         file.on("error", (error) => {
-          fs.unlink(filePath, () => {});
+          fs.unlink(filePath, () => { });
           reject(error);
         });
       })
       .on("error", (error) => {
         file.close();
-        fs.unlink(filePath, () => {});
+        fs.unlink(filePath, () => { });
         reject(error);
       });
   });
@@ -185,8 +208,8 @@ async function installClient(username = "Player", options = {}, sendLogToRendere
     sendLogToRenderer(`Проверка Java перед установкой...`, "info");
     let javaPath;
     try {
-      javaPath = options.javaPath && options.javaPath !== "(Автоматически)" 
-        ? options.javaPath 
+      javaPath = options.javaPath && options.javaPath !== "(Автоматически)"
+        ? options.javaPath
         : await downloadJava(sendLogToRenderer);
     } catch (error) {
       sendLogToRenderer(`Ошибка установки Java: ${error.message}`, "error");
