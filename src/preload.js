@@ -48,5 +48,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Проверка ОС
   checkSystemJava: () => ipcRenderer.invoke('check-system-java'),
-  getSystemInfo: () => ipcRenderer.invoke('get-system-info')
+  getSystemInfo: () => ipcRenderer.invoke('get-system-info'),
+  // Новые методы для автозапоминания аккаунта
+getSavedAccount: () => ipcRenderer.invoke('get-saved-account'),
+autoLogin: () => ipcRenderer.invoke('auto-login'),
+clearSavedAccount: () => ipcRenderer.invoke('clear-saved-account')
 });

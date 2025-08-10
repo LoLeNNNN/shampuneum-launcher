@@ -29,7 +29,26 @@
         <label for="password">Пароль</label>
         <input type="password" id="password" placeholder="Введите пароль">
       </div>
-      <button id="login-button" class="play-btn">Войти</button>
+      <div class="form-group">
+        <div class="checkbox-container">
+          <input type="checkbox" id="remember-me" class="settings-checkbox">
+          <label for="remember-me" class="checkbox-label">
+            Запомнить меня
+            <span class="tooltip">?
+              <span class="tooltip-text">Пароль будет зашифрован и сохранен локально</span>
+            </span>
+          </label>
+        </div>
+      </div>
+      <div class="login-actions">
+        <button id="login-button" class="play-btn">Войти</button>
+        <button id="clear-saved-btn" class="secondary-btn" style="display: none;">Забыть аккаунт</button>
+      </div>
+      <div id="saved-account-info" class="saved-account-info" style="display: none;">
+        <div class="saved-icon">💾</div>
+        <span id="saved-username">username</span>
+        <span class="saved-label">сохранен</span>
+      </div>
     </div>
   </div>
   <div id="update-modal" class="modal" style="display: none;">
@@ -198,9 +217,7 @@
                   <span class="memory-percentage" id="memory-percentage"></span>
                 </div>
               </div>
-              <div class="system-memory-info" id="memory-system-info">
-                <!-- Здесь будет информация о системной памяти -->
-              </div>
+
             </div>
 
             <div class="form-group">
@@ -210,120 +227,121 @@
                   <span class="tooltip-text">Начальный объем памяти при запуске</span>
                 </span>
               </label>
-              <select id="min-memory" class="settings-select">
-                <option value="1G">1 GB</option>
-                <option value="2G" selected>2 GB</option>
-                <option value="3G">3 GB</option>
-                <option value="4G">4 GB</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Настройки Java -->
-          <div class="settings-section">
-            <h3>Настройки Java</h3>
-
-            <div class="form-group">
-              <label for="java-path">
-                Путь к Java:
-                <span class="tooltip">?
-                  <span class="tooltip-text">Лаунчер автоматически определит лучшую версию Java</span>
-                </span>
-              </label>
-              <div class="java-path-container">
-                <input type="text" id="java-path" value="(Автоматически)" readonly class="java-path-input">
-                <button id="select-java-path" class="secondary-btn">Выбрать</button>
+              <div class="memory-control">
+                <input type="range" id="min-memory" min="1" max="8" value="2" class="memory-slider">
+                <div class="memory-display">
+                  <span id="min-memory-value">2 GB</span>
+                </div>
               </div>
-              <div class="java-status" id="java-status">
-                <!-- Здесь будет статус Java -->
-              </div>
-            </div>
-          </div>
-
-          <!-- Настройки производительности -->
-          <div class="settings-section">
-            <h3>Производительность</h3>
-
-            <div class="form-group">
-              <label>
-                Приоритет процесса:
-                <span class="tooltip">?
-                  <span class="tooltip-text">Высокий приоритет может улучшить производительность</span>
-                </span>
-              </label>
-              <div class="checkbox-container">
-                <input type="checkbox" id="high-priority" class="settings-checkbox">
-                <label for="high-priority" class="checkbox-label">Высокий приоритет</label>
+                            <div class="system-memory-info" id="memory-system-info">
               </div>
             </div>
 
-            <div class="form-group">
-              <label>
-                Оптимизация сборщика мусора:
-                <span class="tooltip">?
-                  <span class="tooltip-text">Улучшает производительность за счет оптимизации работы с памятью</span>
-                </span>
-              </label>
-              <div class="checkbox-container">
-                <input type="checkbox" id="gc-optimization" class="settings-checkbox" checked>
-                <label for="gc-optimization" class="checkbox-label">Включить оптимизацию GC</label>
-              </div>
-            </div>
-          </div>
+            <!-- Настройки Java -->
+            <div class="settings-section">
+              <h3>Настройки Java</h3>
 
-          <!-- Настройки лаунчера -->
-          <div class="settings-section">
-            <h3>Настройки лаунчера</h3>
-
-            <div class="form-group">
-              <label>
-                Автообновления:
-                <span class="tooltip">?
-                  <span class="tooltip-text">Автоматически проверять и устанавливать обновления</span>
-                </span>
-              </label>
-              <div class="checkbox-container">
-                <input type="checkbox" id="auto-updates" class="settings-checkbox" checked>
-                <label for="auto-updates" class="checkbox-label">Автоматические обновления</label>
+              <div class="form-group">
+                <label for="java-path">
+                  Путь к Java:
+                  <span class="tooltip">?
+                    <span class="tooltip-text">Лаунчер автоматически определит лучшую версию Java</span>
+                  </span>
+                </label>
+                <div class="java-path-container">
+                  <input type="text" id="java-path" value="(Автоматически)" readonly class="java-path-input">
+                  <button id="select-java-path" class="secondary-btn">Выбрать</button>
+                </div>
+                <div class="java-status" id="java-status">
+                  <!-- Здесь будет статус Java -->
+                </div>
               </div>
             </div>
 
-            <div class="form-group">
-              <label>
-                Закрытие лаунчера:
-                <span class="tooltip">?
-                  <span class="tooltip-text">Закрывать лаунчер после запуска игры</span>
-                </span>
-              </label>
-              <div class="checkbox-container">
-                <input type="checkbox" id="close-launcher" class="settings-checkbox">
-                <label for="close-launcher" class="checkbox-label">Закрывать после запуска</label>
+            <!-- Настройки производительности -->
+            <div class="settings-section">
+              <h3>Производительность</h3>
+
+              <div class="form-group">
+                <label>
+                  Приоритет процесса:
+                  <span class="tooltip">?
+                    <span class="tooltip-text">Высокий приоритет может улучшить производительность</span>
+                  </span>
+                </label>
+                <div class="checkbox-container">
+                  <input type="checkbox" id="high-priority" class="settings-checkbox">
+                  <label for="high-priority" class="checkbox-label">Высокий приоритет</label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>
+                  Оптимизация сборщика мусора:
+                  <span class="tooltip">?
+                    <span class="tooltip-text">Улучшает производительность за счет оптимизации работы с памятью</span>
+                  </span>
+                </label>
+                <div class="checkbox-container">
+                  <input type="checkbox" id="gc-optimization" class="settings-checkbox" checked>
+                  <label for="gc-optimization" class="checkbox-label">Включить оптимизацию GC</label>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="settings-actions">
-            <button id="save-settings" class="play-btn">Сохранить настройки</button>
-            <button id="reset-settings" class="secondary-btn">Сбросить</button>
-            <button id="check-updates-manual" class="secondary-btn">Проверить обновления</button>
+            <!-- Настройки лаунчера -->
+            <div class="settings-section">
+              <h3>Настройки лаунчера</h3>
+
+              <div class="form-group">
+                <label>
+                  Автообновления:
+                  <span class="tooltip">?
+                    <span class="tooltip-text">Автоматически проверять и устанавливать обновления</span>
+                  </span>
+                </label>
+                <div class="checkbox-container">
+                  <input type="checkbox" id="auto-updates" class="settings-checkbox" checked>
+                  <label for="auto-updates" class="checkbox-label">Автоматические обновления</label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>
+                  Закрытие лаунчера:
+                  <span class="tooltip">?
+                    <span class="tooltip-text">Закрывать лаунчер после запуска игры</span>
+                  </span>
+                </label>
+                <div class="checkbox-container">
+                  <input type="checkbox" id="close-launcher" class="settings-checkbox">
+                  <label for="close-launcher" class="checkbox-label">Закрывать после запуска</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-actions">
+              <button id="save-settings" class="play-btn">Сохранить настройки</button>
+              <button id="reset-settings" class="secondary-btn">Сбросить</button>
+              <button id="check-updates-manual" class="secondary-btn">Проверить обновления</button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Логи -->
-      <div id="logs-tab" class="tab-content">
-        <div class="settings-form">
-          <h2>ЖУРНАЛ СОБЫТИЙ</h2>
-          <p>История работы лаунчера</p>
+        <!-- Логи -->
+        <div id="logs-tab" class="tab-content">
+          <div class="settings-form">
+            <h2>ЖУРНАЛ СОБЫТИЙ</h2>
+            <p>История работы лаунчера</p>
 
-          <div id="log-container"
-            style="background-color: #1e2a33; border-radius: 8px; padding: 20px; color: var(--text-light); font-family: monospace; height: 100%; overflow-y: auto; white-space: pre-wrap;">
+            <div id="log-container"
+              style="background-color: #1e2a33; border-radius: 8px; padding: 20px; color: var(--text-light); font-family: monospace; height: 100%; overflow-y: auto; white-space: pre-wrap;">
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <script src=scripts.js></script>
+    <script src=scripts.js></script>
 </body>
 
 </html>

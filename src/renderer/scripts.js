@@ -126,7 +126,125 @@
       });
     }
   }
+  // Проверка сохраненного аккаунта при запуске
+  async function checkSavedAccount() {
+    if (!isElectron || !electronAPI) return null;
 
+    try {
+      const savedAccount = await electronAPI.getSavedAccount();
+      if (savedAccount) {
+        appendLog(
+          `Найден сохраненный аккаунт: ${savedAccount.username}`,
+          "info"
+        );
+        showSavedAccountInfo(savedAccount.username);
+        return savedAccount;
+      }
+    } catch (error) {
+      appendLog(
+        "Ошибка загрузки сохраненного аккаунта: " + error.message,
+        "error"
+      );
+    }
+    return null;
+  }
+
+  // Показать информацию о сохраненном аккаунте
+  function showSavedAccountInfo(username) {
+    const savedInfo = document.getElementById("saved-account-info");
+    const savedUsernameEl = document.getElementById("saved-username");
+    const clearSavedBtn = document.getElementById("clear-saved-btn");
+    const usernameInput = elements.usernameInput;
+    const rememberCheckbox = document.getElementById("remember-me");
+
+    if (savedInfo && savedUsernameEl) {
+      savedUsernameEl.textContent = username;
+      savedInfo.style.display = "flex";
+
+      if (clearSavedBtn) {
+        clearSavedBtn.style.display = "inline-block";
+      }
+
+      if (usernameInput) {
+        usernameInput.value = username;
+        usernameInput.setAttribute("readonly", true);
+      }
+
+      if (rememberCheckbox) {
+        rememberCheckbox.checked = true;
+      }
+    }
+  }
+
+  // Скрыть информацию о сохраненном аккаунте
+  function hideSavedAccountInfo() {
+    const savedInfo = document.getElementById("saved-account-info");
+    const clearSavedBtn = document.getElementById("clear-saved-btn");
+    const usernameInput = elements.usernameInput;
+
+    if (savedInfo) {
+      savedInfo.style.display = "none";
+    }
+
+    if (clearSavedBtn) {
+      clearSavedBtn.style.display = "none";
+    }
+
+    if (usernameInput) {
+      usernameInput.value = "";
+      usernameInput.removeAttribute("readonly");
+    }
+  }
+
+  // Попытка автоавторизации с сохраненными данными
+  async function attemptAutoLogin() {
+    if (!isElectron || !electronAPI) return false;
+
+    try {
+      appendLog("Попытка автоавторизации...", "info");
+
+      const authResult = await electronAPI.autoLogin();
+
+      if (authResult.success) {
+        showToast("Автоавторизация успешна", "success");
+        setAuthenticatedUser({
+          username: authResult.username,
+          access: authResult.access,
+          autoLogin: true,
+        });
+        return true;
+      } else {
+        appendLog("Автоавторизация неудачна: " + authResult.message, "warning");
+        if (authResult.message !== "Нет сохраненных данных аккаунта") {
+          showToast("Требуется повторная авторизация", "info");
+          hideSavedAccountInfo();
+        }
+        return false;
+      }
+    } catch (error) {
+      appendLog("Ошибка автоавторизации: " + error.message, "error");
+      return false;
+    }
+  }
+
+  // Очистка сохраненного аккаунта
+  async function clearSavedAccount() {
+    if (!isElectron || !electronAPI) return;
+
+    if (!confirm("Удалить сохраненные данные аккаунта?")) {
+      return;
+    }
+
+    try {
+      await electronAPI.clearSavedAccount();
+      hideSavedAccountInfo();
+      showToast("Сохраненный аккаунт удален", "info");
+      appendLog("Данные сохраненного аккаунта очищены", "info");
+    } catch (error) {
+      showToast("Ошибка при удалении аккаунта", "error");
+      appendLog("Ошибка очистки аккаунта: " + error.message, "error");
+    }
+  }
   function showUpdateModal(updateInfo) {
     currentUpdateInfo = updateInfo;
 
@@ -282,68 +400,68 @@
       isUpdating = false;
     }
   }
-async function checkSystemJava() {
-  if (!isElectron || !electronAPI) return null;
+  async function checkSystemJava() {
+    if (!isElectron || !electronAPI) return null;
 
-  try {
-    // Используем electronAPI для выполнения команды вместо require
-    const result = await electronAPI.checkSystemJava();
-    
-    if (result && result.version) {
-      const majorVersion = result.version;
-      const isCompatible = majorVersion >= 21;
+    try {
+      // Используем electronAPI для выполнения команды вместо require
+      const result = await electronAPI.checkSystemJava();
 
-      appendLog(
-        `Найдена системная Java версии ${majorVersion} (${
-          isCompatible ? "совместима" : "несовместима"
-        })`,
-        isCompatible ? "success" : "warning"
-      );
+      if (result && result.version) {
+        const majorVersion = result.version;
+        const isCompatible = majorVersion >= 21;
 
-      return {
-        version: majorVersion,
-        compatible: isCompatible,
-        path: "java", // Указываем что это системная Java
-      };
+        appendLog(
+          `Найдена системная Java версии ${majorVersion} (${
+            isCompatible ? "совместима" : "несовместима"
+          })`,
+          isCompatible ? "success" : "warning"
+        );
+
+        return {
+          version: majorVersion,
+          compatible: isCompatible,
+          path: "java", // Указываем что это системная Java
+        };
+      }
+    } catch (error) {
+      appendLog("Системная Java не найдена", "info");
     }
-  } catch (error) {
-    appendLog("Системная Java не найдена", "info");
-  }
 
-  return null;
-}
+    return null;
+  }
   async function getSystemInfo() {
-  if (!isElectron || !electronAPI) return null;
+    if (!isElectron || !electronAPI) return null;
 
-  try {
-    // Используем electronAPI для получения информации о системе
-    const systemInfo = await electronAPI.getSystemInfo();
-    
-    if (systemInfo) {
-      const totalMemoryGB = systemInfo.totalMemory;
-      const recommendedMemory = Math.max(2, Math.floor(totalMemoryGB * 0.5)); // 50% от общей памяти, минимум 2GB
-      const maxRecommended = Math.min(16, Math.floor(totalMemoryGB * 0.8)); // Максимум 80% от общей памяти
+    try {
+      // Используем electronAPI для получения информации о системе
+      const systemInfo = await electronAPI.getSystemInfo();
 
-      return {
-        totalMemory: totalMemoryGB,
-        recommendedMemory,
-        maxRecommended,
-      };
+      if (systemInfo) {
+        const totalMemoryGB = systemInfo.totalMemory;
+        const recommendedMemory = Math.max(2, Math.floor(totalMemoryGB * 0.5)); // 50% от общей памяти, минимум 2GB
+        const maxRecommended = Math.min(16, Math.floor(totalMemoryGB * 0.8)); // Максимум 80% от общей памяти
+
+        return {
+          totalMemory: totalMemoryGB,
+          recommendedMemory,
+          maxRecommended,
+        };
+      }
+    } catch (error) {
+      appendLog(
+        `Ошибка получения информации о системе: ${error.message}`,
+        "error"
+      );
     }
-  } catch (error) {
-    appendLog(
-      `Ошибка получения информации о системе: ${error.message}`,
-      "error"
-    );
+
+    // Возвращаем значения по умолчанию если не удалось получить системную информацию
+    return {
+      totalMemory: 8,
+      recommendedMemory: 4,
+      maxRecommended: 8,
+    };
   }
-  
-  // Возвращаем значения по умолчанию если не удалось получить системную информацию
-  return {
-    totalMemory: 8,
-    recommendedMemory: 4,
-    maxRecommended: 8,
-  };
-}
   // Ручная проверка обновлений
   async function checkForUpdatesManually() {
     if (!window.electronAPI) {
@@ -483,10 +601,221 @@ async function checkSystemJava() {
   async function checkAuth() {
     try {
       if (isElectron && electronAPI) {
+        // Сначала проверяем текущего пользователя
         const user = await electronAPI.getCurrentUser();
         if (user) {
           setAuthenticatedUser(user);
           return true;
+        }
+
+        // Если нет текущего пользователя, пробуем автоавторизацию
+        const savedAccount = await checkSavedAccount();
+        if (savedAccount) {
+          const autoLoginSuccess = await attemptAutoLogin();
+          if (autoLoginSuccess) {
+            return true;
+          }
+        }
+      }
+    } catch (error) {
+      appendLog("Ошибка проверки авторизации: " + error.message, "error");
+    }
+    return false;
+  }
+  // Добавить эти функции в scripts.js
+
+  // Проверка сохраненного аккаунта при запуске
+  async function checkSavedAccount() {
+    if (!isElectron || !electronAPI) return null;
+
+    try {
+      const savedAccount = await electronAPI.getSavedAccount();
+      if (savedAccount) {
+        appendLog(
+          `Найден сохраненный аккаунт: ${savedAccount.username}`,
+          "info"
+        );
+        showSavedAccountInfo(savedAccount.username);
+        return savedAccount;
+      }
+    } catch (error) {
+      appendLog(
+        "Ошибка загрузки сохраненного аккаунта: " + error.message,
+        "error"
+      );
+    }
+    return null;
+  }
+
+  // Показать информацию о сохраненном аккаунте
+  function showSavedAccountInfo(username) {
+    const savedInfo = document.getElementById("saved-account-info");
+    const savedUsernameEl = document.getElementById("saved-username");
+    const clearSavedBtn = document.getElementById("clear-saved-btn");
+    const usernameInput = elements.usernameInput;
+    const rememberCheckbox = document.getElementById("remember-me");
+
+    if (savedInfo && savedUsernameEl) {
+      savedUsernameEl.textContent = username;
+      savedInfo.style.display = "flex";
+
+      if (clearSavedBtn) {
+        clearSavedBtn.style.display = "inline-block";
+      }
+
+      if (usernameInput) {
+        usernameInput.value = username;
+        usernameInput.setAttribute("readonly", true);
+      }
+
+      if (rememberCheckbox) {
+        rememberCheckbox.checked = true;
+      }
+    }
+  }
+
+  // Скрыть информацию о сохраненном аккаунте
+  function hideSavedAccountInfo() {
+    const savedInfo = document.getElementById("saved-account-info");
+    const clearSavedBtn = document.getElementById("clear-saved-btn");
+    const usernameInput = elements.usernameInput;
+
+    if (savedInfo) {
+      savedInfo.style.display = "none";
+    }
+
+    if (clearSavedBtn) {
+      clearSavedBtn.style.display = "none";
+    }
+
+    if (usernameInput) {
+      usernameInput.value = "";
+      usernameInput.removeAttribute("readonly");
+    }
+  }
+
+  // Попытка автоавторизации с сохраненными данными
+  async function attemptAutoLogin() {
+    if (!isElectron || !electronAPI) return false;
+
+    try {
+      appendLog("Попытка автоавторизации...", "info");
+
+      const authResult = await electronAPI.autoLogin();
+
+      if (authResult.success) {
+        showToast("Автоавторизация успешна", "success");
+        setAuthenticatedUser({
+          username: authResult.username,
+          access: authResult.access,
+          autoLogin: true,
+        });
+        return true;
+      } else {
+        appendLog("Автоавторизация неудачна: " + authResult.message, "warning");
+        if (authResult.message !== "Нет сохраненных данных аккаунта") {
+          showToast("Требуется повторная авторизация", "info");
+          hideSavedAccountInfo();
+        }
+        return false;
+      }
+    } catch (error) {
+      appendLog("Ошибка автоавторизации: " + error.message, "error");
+      return false;
+    }
+  }
+
+  // Очистка сохраненного аккаунта
+  async function clearSavedAccount() {
+    if (!isElectron || !electronAPI) return;
+
+    if (!confirm("Удалить сохраненные данные аккаунта?")) {
+      return;
+    }
+
+    try {
+      await electronAPI.clearSavedAccount();
+      hideSavedAccountInfo();
+      showToast("Сохраненный аккаунт удален", "info");
+      appendLog("Данные сохраненного аккаунта очищены", "info");
+    } catch (error) {
+      showToast("Ошибка при удалении аккаунта", "error");
+      appendLog("Ошибка очистки аккаунта: " + error.message, "error");
+    }
+  }
+
+  // Обновленная функция авторизации
+  async function handleLogin() {
+    const username = elements.usernameInput?.value?.trim();
+    const password = elements.passwordInput?.value?.trim();
+    const rememberMe = document.getElementById("remember-me")?.checked || false;
+
+    if (!username || !password) {
+      showToast("Введите логин и пароль", "error");
+      return;
+    }
+
+    if (!/^[a-zA-Z0-9_]{3,16}$/.test(username)) {
+      showToast("Ник должен содержать 3-16 символов (a-z, 0-9, _)", "error");
+      return;
+    }
+
+    try {
+      let authResult;
+
+      if (isElectron && electronAPI) {
+        authResult = await electronAPI.sendAuthRequest({
+          username,
+          password,
+          rememberMe,
+        });
+      } else {
+        const response = await fetch("http://95.79.192.194:3000/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        });
+        authResult = await response.json();
+      }
+
+      if (authResult.success) {
+        showToast("Авторизация успешна", "success");
+
+        if (authResult.remembered) {
+          appendLog("Данные аккаунта сохранены для автоавторизации", "info");
+        }
+
+        setAuthenticatedUser({
+          username: authResult.username,
+          access: authResult.access,
+        });
+      } else {
+        showToast(authResult.message || "Ошибка авторизации", "error");
+      }
+    } catch (error) {
+      appendLog("Ошибка авторизации: " + error.message, "error");
+      showToast("Ошибка соединения", "error");
+    }
+  }
+
+  // Обновить checkAuth для автоавторизации
+  async function checkAuth() {
+    try {
+      if (isElectron && electronAPI) {
+        // Сначала проверяем текущего пользователя
+        const user = await electronAPI.getCurrentUser();
+        if (user) {
+          setAuthenticatedUser(user);
+          return true;
+        }
+
+        // Если нет текущего пользователя, пробуем автоавторизацию
+        const savedAccount = await checkSavedAccount();
+        if (savedAccount) {
+          const autoLoginSuccess = await attemptAutoLogin();
+          if (autoLoginSuccess) {
+            return true;
+          }
         }
       }
     } catch (error) {
@@ -495,6 +824,13 @@ async function checkSystemJava() {
     return false;
   }
 
+  // Добавить обработчик для кнопки "Забыть аккаунт"
+  function setupClearSavedAccountHandler() {
+    const clearSavedBtn = document.getElementById("clear-saved-btn");
+    if (clearSavedBtn) {
+      clearSavedBtn.addEventListener("click", clearSavedAccount);
+    }
+  }
   function setAuthenticatedUser(user) {
     isAuthenticated = true;
     currentUser = user;
@@ -521,6 +857,7 @@ async function checkSystemJava() {
   async function handleLogin() {
     const username = elements.usernameInput?.value?.trim();
     const password = elements.passwordInput?.value?.trim();
+    const rememberMe = document.getElementById("remember-me")?.checked || false;
 
     if (!username || !password) {
       showToast("Введите логин и пароль", "error");
@@ -536,7 +873,11 @@ async function checkSystemJava() {
       let authResult;
 
       if (isElectron && electronAPI) {
-        authResult = await electronAPI.sendAuthRequest({ username, password });
+        authResult = await electronAPI.sendAuthRequest({
+          username,
+          password,
+          rememberMe,
+        });
       } else {
         const response = await fetch("http://95.79.192.194:3000/login", {
           method: "POST",
@@ -548,6 +889,11 @@ async function checkSystemJava() {
 
       if (authResult.success) {
         showToast("Авторизация успешна", "success");
+
+        if (authResult.remembered) {
+          appendLog("Данные аккаунта сохранены для автоавторизации", "info");
+        }
+
         setAuthenticatedUser({
           username: authResult.username,
           access: authResult.access,
@@ -560,7 +906,6 @@ async function checkSystemJava() {
       showToast("Ошибка соединения", "error");
     }
   }
-
   async function handleInstall() {
     if (isInstalling || !isAuthenticated) return;
 
@@ -1011,7 +1356,7 @@ async function checkSystemJava() {
     setupJavaPathHandler();
     setupExitHandler();
     setupMemorySliders();
-
+    setupClearSavedAccountHandler();
     elements.menuItems.forEach((item) => {
       item.addEventListener("click", () => {
         const tab = item.dataset.tab;
@@ -1114,17 +1459,17 @@ async function checkSystemJava() {
       });
     }
   }
-async function initializeSettings() {
-  // Загружаем настройки с автоопределением системы
-  await loadSettings();
-  
-  // Обновляем процентное отображение памяти
-  updateMemoryPercentage();
-  
-  // Устанавливаем обработчики событий для слайдеров
-  setupMemorySliders();
-  appendLog('Настройки инициализированы', 'success');
-}
+  async function initializeSettings() {
+    // Загружаем настройки с автоопределением системы
+    await loadSettings();
+
+    // Обновляем процентное отображение памяти
+    updateMemoryPercentage();
+
+    // Устанавливаем обработчики событий для слайдеров
+    setupMemorySliders();
+    appendLog("Настройки инициализированы", "success");
+  }
   async function initialize() {
     appendLog("=== SHAMPUNEUM LAUNCHER ===");
     appendLog(
@@ -1133,13 +1478,13 @@ async function initializeSettings() {
       }`
     );
 
-     if (isElectron) {
-    await getAppInfo();
-    await initializeSettings();
-    setupIpcListeners();
-  } else {
-    appendLog('Некоторые функции недоступны в браузере', 'warning');
-  }
+    if (isElectron) {
+      await getAppInfo();
+      await initializeSettings();
+      setupIpcListeners();
+    } else {
+      appendLog("Некоторые функции недоступны в браузере", "warning");
+    }
     const isAuth = await checkAuth();
     if (!isAuth) {
       if (elements.loginModal) elements.loginModal.style.display = "flex";
