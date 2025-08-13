@@ -57,7 +57,7 @@
       <div class="update-header">
         <h2>🎉 Доступно обновление!</h2>
         <div class="update-version">
-          Версия <span id="update-version-text">1.0.1</span>
+          Версия <span id="update-version-text">1.1.0</span>
         </div>
       </div>
 
@@ -69,7 +69,7 @@
           </div>
           <div class="detail-item">
             <span class="detail-label">Дата выпуска:</span>
-            <span id="update-date-text">29.07.2025</span>
+            <span id="update-date-text">13.08.2025</span>
           </div>
           <div class="detail-item">
             <span class="detail-label">Тип:</span>
@@ -138,7 +138,7 @@
               и стабильным тпс. Подай заявку сегодня
               и становись частью нашего комьюнити.</p>
           </div>
-          <div class="version-info">Лаунчер v1.0.1</div>
+          <div class="version-info">Лаунчер v1.1.0</div>
         </div>
         <div class="footer">
           <div class="user-info">
@@ -166,32 +166,108 @@
         </div>
       </div>
       <!-- Профиль -->
-      <div id="profile-tab" class="tab-content">
-        <div class="settings-form">
-          <h2>ПРОФИЛЬ</h2>
-          <p>Управление игровыми профилями</p>
+<!-- Заменить секцию профиля в HTML -->
+<div id="profile-tab" class="tab-content">
+  <div class="settings-form">
+    <h2>ПРОФИЛЬ</h2>
+    <p>Управление игровыми профилями и настройка скина</p>
 
-          <div class="form-group">
-            <label>Текущий профиль</label>
-            <div class="user-info" style="margin-top: 10px;">
-              <div class="avatar-sm">
-                <img src="images/image-20-41.png" alt="Small Avatar">
-              </div>
-              <div class="details">
-                <div class="name">neettik<span class="online-status"></span></div>
-                <div>Проходка: навсегда</div>
-              </div>
-            </div>
+    <div class="settings-section">
+      <h3>Информация о профиле</h3>
+      
+      <div class="form-group">
+        <label>Текущий профиль</label>
+        <div class="user-info" style="margin-top: 10px; padding: 16px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+          <div class="avatar-sm">
+            <img src="images/image-20-41.png" alt="Profile Avatar">
           </div>
-
-          <div class="form-group">
-            <label for="skin-upload">//todo Загрузить скин</label>
-            <input type="file" id="skin-upload" accept="image/png" style="margin-top: 8px;">
+          <div class="details">
+            <div class="name" id="profile-username">Загрузка...<span class="online-status"></span></div>
+            <div id="profile-access">Проходка: загрузка...</div>
           </div>
-
-          <button class="play-btn" style="align-self: flex-start; margin-top: 20px;">Сохранить профиль</button>
         </div>
       </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Настройка скина</h3>
+      
+      <div class="form-group">
+        <label for="skin-upload">
+          Загрузить скин
+          <span class="tooltip">?
+            <span class="tooltip-text">Поддерживаются PNG файлы размером 64x64 или 64x32 пикселя</span>
+          </span>
+        </label>
+        <input type="file" id="skin-upload" accept="image/png,image/jpeg" 
+               style="margin-top: 8px; padding: 12px; border: 2px dashed rgba(255,140,52,0.3); border-radius: 8px; background: rgba(255,255,255,0.03);">
+      </div>
+
+      <!-- Превью скина -->
+      <div id="preview-container" class="form-group" style="display: none;">
+        <label>Предпросмотр скина</label>
+        <div style="display: flex; gap: 20px; align-items: flex-start; margin-top: 12px;">
+          <div style="flex-shrink: 0;">
+            <img id="skin-preview" style="width: 128px; height: 128px; border: 2px solid var(--primary); border-radius: 8px; background: #1e2a33; image-rendering: pixelated;" alt="Skin Preview">
+          </div>
+          <div id="preview-info" style="flex: 1; color: var(--text-muted); font-size: 14px;">
+            <!-- Информация о файле будет вставлена сюда -->
+          </div>
+        </div>
+        
+        <div style="display: flex; gap: 12px; margin-top: 16px;">
+          <button id="apply-skin" class="play-btn" disabled>
+            <span class="btn-icon">✓</span>
+            Применить скин
+          </button>
+          <button id="reset-skin" class="secondary-btn">
+            <span class="btn-icon">↺</span>
+            Сбросить
+          </button>
+        </div>
+      </div>
+
+            <div class="form-group" style="margin-top: 20px;">
+        <div style="background: rgba(255,193,7,0.1); padding: 12px; border-radius: 8px; border-left: 3px solid #ffc107;">
+          <div style="color: #ffc107; font-size: 14px; font-weight: 600; margin-bottom: 8px;">
+            ⚠️ Функция в разработке
+          </div>
+          <div style="color: var(--text-muted); font-size: 13px; line-height: 1.4;">
+            <strong style="color: var(--text-light);">Загрузка скинов временно недоступна.</strong><br>
+            • Функция находится в стадии разработки<br>
+            • Превью работает, но загрузка на сервер пока не реализована<br>
+            • Аватарки загружаются по умолчанию из встроенных изображений
+          </div>
+        </div>
+        
+        <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; border-left: 3px solid var(--primary); margin-top: 12px;">
+          <div style="color: var(--text-muted); font-size: 13px; line-height: 1.4;">
+            <strong style="color: var(--text-light);">Требования к скину:</strong><br>
+            • Формат: PNG или JPEG<br>
+            • Размер: 64x64 или 64x32 пикселя<br>
+            • Максимальный размер файла: 5MB<br>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Действия с профилем</h3>
+      
+      <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+        <button class="play-btn" style="flex: 1; min-width: 200px;" onclick="showToast('Функция в разработке', 'info')">
+          <span class="btn-icon">💾</span>
+          Экспорт профиля
+        </button>
+        
+        <button class="secondary-btn" style="flex: 1; min-width: 200px;" onclick="handleLogout()">
+          <span class="btn-icon">🚪</span>
+          Выйти из аккаунта
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
       <!-- Настройки -->
       <div id="settings-tab" class="tab-content">
@@ -200,43 +276,42 @@
           <p>Настройте параметры лаунчера и игры для оптимального опыта.</p>
 
           <!-- Настройки памяти -->
-          <div class="settings-section">
-            <h3>Управление памятью</h3>
+<div class="settings-section">
+  <h3>Управление памятью</h3>
 
-            <div class="form-group">
-              <label for="max-memory">
-                Максимальная память:
-                <span class="tooltip">?
-                  <span class="tooltip-text">Максимальный объем ОЗУ, выделяемый для Minecraft</span>
-                </span>
-              </label>
-              <div class="memory-slider-container">
-                <input type="range" id="max-memory" min="2" max="16" value="4" class="memory-slider">
-                <div class="memory-display">
-                  <span id="max-memory-value">4 GB</span>
-                  <span class="memory-percentage" id="memory-percentage"></span>
-                </div>
-              </div>
+  <div class="form-group">
+    <label for="max-memory">
+      Максимальная память:
+      <span class="tooltip">?
+        <span class="tooltip-text">Максимальный объем ОЗУ, выделяемый для Minecraft</span>
+      </span>
+    </label>
+    <div class="memory-slider-container">
+      <input type="range" id="max-memory" min="2" max="16" value="4" class="memory-slider">
+      <div class="memory-display">
+        <span id="max-memory-value">4 GB</span>
+        <span class="memory-percentage" id="memory-percentage"></span>
+      </div>
+    </div>
+  </div>
 
-            </div>
-
-            <div class="form-group">
-              <label for="min-memory">
-                Минимальная память:
-                <span class="tooltip">?
-                  <span class="tooltip-text">Начальный объем памяти при запуске</span>
-                </span>
-              </label>
-              <div class="memory-control">
-                <input type="range" id="min-memory" min="1" max="8" value="2" class="memory-slider">
-                <div class="memory-display">
-                  <span id="min-memory-value">2 GB</span>
-                </div>
-              </div>
-                            <div class="system-memory-info" id="memory-system-info">
-              </div>
-            </div>
-
+  <div class="form-group">
+    <label for="min-memory">
+      Минимальная память:
+      <span class="tooltip">?
+        <span class="tooltip-text">Начальный объем памяти при запуске</span>
+      </span>
+    </label>
+    <div class="memory-control">
+      <input type="range" id="min-memory" min="1" max="8" value="2" class="memory-slider">
+      <div class="memory-display">
+        <span id="min-memory-value">2 GB</span>
+      </div>
+    </div>
+    <div class="system-memory-info" id="memory-system-info">
+    </div>
+  </div>
+</div>
             <!-- Настройки Java -->
             <div class="settings-section">
               <h3>Настройки Java</h3>

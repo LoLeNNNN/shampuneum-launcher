@@ -111,7 +111,6 @@ function loadSavedAccount() {
     const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
     if (!config.savedAccount || !config.savedAccount.rememberMe) return null;
 
-    // Проверяем что данные не старше 30 дней
     const daysPassed =
       (Date.now() - config.savedAccount.savedAt) / (1000 * 60 * 60 * 24);
     if (daysPassed > 30) {
@@ -233,7 +232,6 @@ ipcMain.handle(
       if (data.success) {
         currentUsername = username;
 
-        // Сохраняем данные аккаунта если пользователь выбрал "запомнить меня"
         const saved = saveAccountData(username, password, rememberMe);
 
         if (saved) {
@@ -281,7 +279,7 @@ ipcMain.handle("install-client", async (event, options = {}) => {
       maxFps: options.maxFps || "120",
       language: options.language || "ru_ru",
       autoConnectServer: options.autoConnectServer || false,
-      modpack: options.modpack || "ULTRA", // Default to ULTRA
+      modpack: options.modpack || "ULTRA",
     };
 
     const result = await installClient(
@@ -291,7 +289,6 @@ ipcMain.handle("install-client", async (event, options = {}) => {
     );
     sendLogToRenderer("Установка клиента завершена успешно!", "success");
 
-    // Update status after installation
     const newStatus = await checkGameStatus();
     mainWindow.webContents.send("installation-status", newStatus);
 
@@ -401,12 +398,10 @@ ipcMain.handle("download-update", async (_, downloadUrl, fileName) => {
     try {
       let lastProgress = -1;
       updater.onDownloadProgress = (progress) => {
-        // Отправляем прогресс только если он изменился
         if (progress !== lastProgress) {
           lastProgress = progress;
           mainWindow.webContents.send("update-progress", progress);
 
-          // Логируем каждые 10%
           if (progress % 10 === 0) {
             sendLogToRenderer(`Прогресс загрузки: ${progress}%`, "info");
           }
@@ -519,7 +514,6 @@ ipcMain.handle("auto-login", async () => {
       };
     }
 
-    // Авторизуемся на сервере с расшифрованным паролем
     const response = await fetch("http://95.79.192.194:3000/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -545,7 +539,6 @@ ipcMain.handle("auto-login", async () => {
         autoLogin: true,
       };
     } else {
-      // Если пароль неверный, очищаем сохраненные данные
       clearSavedAccount();
       return {
         success: false,

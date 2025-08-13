@@ -111,13 +111,14 @@ function launchMinecraft(username, options = {}) {
       launchOptions.customArgs.push("--server=shampuneum.net", "--port=25565");
     }
 
-    launcher
-      .launch(launchOptions)
-      .then((proc) => {
-        if (!proc) {
-          reject(new Error("Не удалось запустить Minecraft (процесс не создан)"));
-          return;
-        }
+    launcher.launch(launchOptions)
+  .then((proc) => {
+    console.log("Minecraft PID:", proc.pid);
+    proc.stdout.on('data', (data) => console.log(`MC: ${data}`));
+    proc.stderr.on('data', (data) => console.error(`MC ERR: ${data}`));
+    proc.on('close', (code) => console.log(`MC exited: ${code}`));
+    
+    resolve({ success: true, pid: proc.pid });
 
         resolve({
           success: true,
