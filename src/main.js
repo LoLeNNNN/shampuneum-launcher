@@ -147,7 +147,7 @@ function createWindow() {
     resizable: true,
     minWidth: 1200,
     minHeight: 800,
-    autoHideMenuBar: false,
+    autoHideMenuBar: true,
     icon: path.join(__dirname, "renderer/images/ico.ico"),
     webPreferences: {
       nodeIntegration: false,
@@ -158,6 +158,7 @@ function createWindow() {
     frame: true,
     titleBarStyle: "default",
   });
+  mainWindow.setMenu(null);
   updater = new LauncherUpdater(mainWindow);
 
   checkGameStatus()
