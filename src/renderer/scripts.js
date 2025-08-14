@@ -346,7 +346,7 @@
         return {
           version: majorVersion,
           compatible: isCompatible,
-          path: "java", 
+          path: "java",
         };
       }
     } catch (error) {
@@ -770,21 +770,21 @@
       checkClientStatus();
     }, 500);
   }
-function updateProfileInfo(user) {
-  const profileUsername = document.getElementById("profile-username");
-  const profileAccess = document.getElementById("profile-access");
+  function updateProfileInfo(user) {
+    const profileUsername = document.getElementById("profile-username");
+    const profileAccess = document.getElementById("profile-access");
 
-  if (profileUsername) {
-    profileUsername.textContent = user.username || "Пользователь";
+    if (profileUsername) {
+      profileUsername.textContent = user.username || "Пользователь";
+    }
+
+    if (profileAccess) {
+      profileAccess.textContent = `Проходка: ${user.access || "навсегда"}`;
+    }
+
+    // Комментируем загрузку аватарки по нику
+    // updateAvatarSkin(user.username);
   }
-
-  if (profileAccess) {
-    profileAccess.textContent = `Проходка: ${user.access || "навсегда"}`;
-  }
-
-  // Комментируем загрузку аватарки по нику
-  // updateAvatarSkin(user.username);
-}
 
   function updateAvatarSkin(username) {
     const minecraftSkinUrl = `https://minotar.net/avatar/${username}/100`;
@@ -892,16 +892,15 @@ function updateProfileInfo(user) {
       applySkinBtn.disabled = false;
     }
   }
-function applySkinPreview() {
-  if (!currentSkinPreview) {
-    showToast("Сначала выберите скин", "warning");
-    return;
+  function applySkinPreview() {
+    if (!currentSkinPreview) {
+      showToast("Сначала выберите скин", "warning");
+      return;
+    }
+
+    showToast("Загрузка скина пока не работает - функция в разработке", "info");
+    appendLog("Попытка применения скина - функция в разработке", "info");
   }
-
-
-  showToast("Загрузка скина пока не работает - функция в разработке", "info");
-  appendLog("Попытка применения скина - функция в разработке", "info");
-}
   async function simulateSkinUpload() {
     const applySkinBtn = document.getElementById("apply-skin");
     const originalText = applySkinBtn?.textContent;
@@ -928,23 +927,34 @@ function applySkinPreview() {
       }
     }
   }
-function resetSkinPreview() {
-  const skinUpload = document.getElementById("skin-upload");
-  const previewContainer = document.getElementById("preview-container");
-  const applySkinBtn = document.getElementById("apply-skin");
+  function normalizeMemoryValue(value, defaultValue = "4G") {
+    if (!value) return defaultValue;
 
-  if (skinUpload) skinUpload.value = "";
-  if (previewContainer) previewContainer.style.display = "none";
-  if (applySkinBtn) applySkinBtn.disabled = true;
+    // Убираем G если есть
+    const numValue = value.toString().replace("G", "");
 
-  if (currentSkinPreview) {
-    URL.revokeObjectURL(currentSkinPreview);
+    // Проверяем что это число
+    if (isNaN(numValue)) return defaultValue;
+
+    return `${numValue}G`;
   }
+  function resetSkinPreview() {
+    const skinUpload = document.getElementById("skin-upload");
+    const previewContainer = document.getElementById("preview-container");
+    const applySkinBtn = document.getElementById("apply-skin");
 
-  currentSkinPreview = null;
-  skinPreviewBlob = null;
-  showToast("Превью скина сброшено", "info");
-}
+    if (skinUpload) skinUpload.value = "";
+    if (previewContainer) previewContainer.style.display = "none";
+    if (applySkinBtn) applySkinBtn.disabled = true;
+
+    if (currentSkinPreview) {
+      URL.revokeObjectURL(currentSkinPreview);
+    }
+
+    currentSkinPreview = null;
+    skinPreviewBlob = null;
+    showToast("Превью скина сброшено", "info");
+  }
   async function handleLogin() {
     const username = elements.usernameInput?.value?.trim();
     const password = elements.passwordInput?.value?.trim();
@@ -1001,12 +1011,8 @@ function resetSkinPreview() {
       document.getElementById("gc-optimization")?.checked || true;
     const options = {
       version: "1.21.8",
-      maxMemory: elements.maxMemoryInput
-        ? `${elements.maxMemoryInput.value}`
-        : "4G",
-      minMemory: elements.minMemorySelect
-        ? elements.minMemorySelect.value
-        : "2G",
+      maxMemory: normalizeMemoryValue(elements.maxMemoryInput?.value, "4G"),
+      minMemory: normalizeMemoryValue(elements.minMemorySelect?.value, "2G"),
       javaPath:
         elements.javaPathInput?.value === "(Автоматически)"
           ? undefined
@@ -1042,82 +1048,78 @@ function resetSkinPreview() {
       updateButtonStates();
     }
   }
-async function handlePlay() {
-  if (isPlaying || !isAuthenticated) return;
-  if (!isClientInstalled) {
-    showToast("Сначала установите клиент", "error");
-    return;
-  }
-  isPlaying = true;
-  updateButtonStates();
-  
-  const highPriority =
-    document.getElementById("high-priority")?.checked || false;
-  const gcOptimization =
-    document.getElementById("gc-optimization")?.checked || true;
-  const closeLauncher =
-    document.getElementById("close-launcher")?.checked || false;
-  const version = elements.versionSelect
-    ? elements.versionSelect.value.split("-")[0]
-    : "1.21.8";
-  const options = {
-    version: version,
-    useAdmin: false,
-    maxMemory: elements.maxMemoryInput
-      ? `${elements.maxMemoryInput.value}`
-      : "4G",
-    minMemory: elements.minMemorySelect
-      ? `${elements.minMemorySelect.value}`
-      : "2G",
-    javaPath:
-      elements.javaPathInput?.value === "(Автоматически)"
-        ? undefined
-        : elements.javaPathInput?.value,
-    modpack: elements.versionSelect ? elements.versionSelect.value : "ULTRA",
-    highPriority,
-    gcOptimization,
-    closeLauncher,
-  };
-  
-  appendLog(
-    `Запуск Minecraft ${options.version} для игрока ${currentUser?.username}`
-  );
-  appendLog(
-    `Настройки производительности: Приоритет ${
-      highPriority ? "высокий" : "обычный"
-    }, GC оптимизация: ${gcOptimization ? "да" : "нет"}`
-  );
-  
-  try {
-    if (!isElectron || !electronAPI) {
-      throw new Error("Функция доступна только в приложении");
+  async function handlePlay() {
+    if (isPlaying || !isAuthenticated) return;
+    if (!isClientInstalled) {
+      showToast("Сначала установите клиент", "error");
+      return;
     }
-    const result = await electronAPI.launchMinecraft(options);
-    appendLog(
-      `Minecraft запущен (PID: ${result.pid}) для игрока ${result.username}`,
-      "success"
-    );
-    showToast("Minecraft запущен!", "success");
-    if (closeLauncher) {
-      appendLog("Закрытие лаунчера по настройкам пользователя...");
-      setTimeout(async () => {
-        if (isElectron && electronAPI) {
-          await electronAPI.quitApp();
-        }
-      }, 3000);
-    } else {
-      setTimeout(() => {
-        isPlaying = false;
-        updateButtonStates();
-      }, 5000);
-    }
-  } catch (error) {
-    appendLog(`Ошибка запуска: ${error.message}`, "error");
-    showToast(`Ошибка запуска: ${error.message}`, "error");
-    isPlaying = false;
+    isPlaying = true;
     updateButtonStates();
+
+    const highPriority =
+      document.getElementById("high-priority")?.checked || false;
+    const gcOptimization =
+      document.getElementById("gc-optimization")?.checked || true;
+    const closeLauncher =
+      document.getElementById("close-launcher")?.checked || false;
+    const version = elements.versionSelect
+      ? elements.versionSelect.value.split("-")[0]
+      : "1.21.8";
+    const options = {
+      version: version,
+      useAdmin: false,
+      maxMemory: normalizeMemoryValue(elements.maxMemoryInput?.value, "4G"),
+      minMemory: normalizeMemoryValue(elements.minMemorySelect?.value, "2G"),
+      javaPath:
+        elements.javaPathInput?.value === "(Автоматически)"
+          ? undefined
+          : elements.javaPathInput?.value,
+      modpack: elements.versionSelect ? elements.versionSelect.value : "ULTRA",
+      highPriority,
+      gcOptimization,
+      closeLauncher,
+    };
+
+    appendLog(
+      `Запуск Minecraft ${options.version} для игрока ${currentUser?.username}`
+    );
+    appendLog(
+      `Настройки производительности: Приоритет ${
+        highPriority ? "высокий" : "обычный"
+      }, GC оптимизация: ${gcOptimization ? "да" : "нет"}`
+    );
+
+    try {
+      if (!isElectron || !electronAPI) {
+        throw new Error("Функция доступна только в приложении");
+      }
+      const result = await electronAPI.launchMinecraft(options);
+      appendLog(
+        `Minecraft запущен (PID: ${result.pid}) для игрока ${result.username}`,
+        "success"
+      );
+      showToast("Minecraft запущен!", "success");
+      if (closeLauncher) {
+        appendLog("Закрытие лаунчера по настройкам пользователя...");
+        setTimeout(async () => {
+          if (isElectron && electronAPI) {
+            await electronAPI.quitApp();
+          }
+        }, 3000);
+      } else {
+        setTimeout(() => {
+          isPlaying = false;
+          updateButtonStates();
+        }, 5000);
+      }
+    } catch (error) {
+      appendLog(`Ошибка запуска: ${error.message}`, "error");
+      showToast(`Ошибка запуска: ${error.message}`, "error");
+      isPlaying = false;
+      updateButtonStates();
+    }
   }
-}
   async function loadSettings() {
     if (!isElectron || !electronAPI) return;
     try {
@@ -1257,34 +1259,34 @@ async function handlePlay() {
     }
   }
   async function saveSettings() {
-  if (!isElectron || !electronAPI) return;
-  const settings = {
-    maxMemory: elements.maxMemoryInput
-      ? `${elements.maxMemoryInput.value}G`
-      : "4G",
-    minMemory: elements.minMemorySelect
-      ? `${elements.minMemorySelect.value}G`
-      : "2G",
-    javaPath: elements.javaPathInput
-      ? elements.javaPathInput.value
-      : "(Автоматически)",
-    modpack: elements.versionSelect ? elements.versionSelect.value : "ULTRA",
-    highPriority: document.getElementById("high-priority")?.checked || false,
-    gcOptimization:
-      document.getElementById("gc-optimization")?.checked || true,
-    autoUpdates: document.getElementById("auto-updates")?.checked || true,
-    closeLauncher:
-      document.getElementById("close-launcher")?.checked || false,
-  };
-  try {
-    await electronAPI.saveSettings(settings);
-    appendLog("Настройки сохранены с новыми параметрами", "success");
-    showToast("Настройки успешно сохранены!");
-  } catch (error) {
-    appendLog(`Ошибка сохранения настроек: ${error.message}`, "error");
-    showToast(`Ошибка сохранения: ${error.message}`, "error");
+    if (!isElectron || !electronAPI) return;
+    const settings = {
+      maxMemory: elements.maxMemoryInput
+        ? `${elements.maxMemoryInput.value}G`
+        : "4G",
+      minMemory: elements.minMemorySelect
+        ? `${elements.minMemorySelect.value}G`
+        : "2G",
+      javaPath: elements.javaPathInput
+        ? elements.javaPathInput.value
+        : "(Автоматически)",
+      modpack: elements.versionSelect ? elements.versionSelect.value : "ULTRA",
+      highPriority: document.getElementById("high-priority")?.checked || false,
+      gcOptimization:
+        document.getElementById("gc-optimization")?.checked || true,
+      autoUpdates: document.getElementById("auto-updates")?.checked || true,
+      closeLauncher:
+        document.getElementById("close-launcher")?.checked || false,
+    };
+    try {
+      await electronAPI.saveSettings(settings);
+      appendLog("Настройки сохранены с новыми параметрами", "success");
+      showToast("Настройки успешно сохранены!");
+    } catch (error) {
+      appendLog(`Ошибка сохранения настроек: ${error.message}`, "error");
+      showToast(`Ошибка сохранения: ${error.message}`, "error");
+    }
   }
-}
   async function getAppInfo() {
     if (!isElectron || !electronAPI) return;
     try {
@@ -1386,7 +1388,7 @@ async function handlePlay() {
     setupExitHandler();
     setupMemorySliders();
     setupClearSavedAccountHandler();
-      setupProfileEventListeners();
+    setupProfileEventListeners();
     elements.menuItems.forEach((item) => {
       item.addEventListener("click", () => {
         const tab = item.dataset.tab;
