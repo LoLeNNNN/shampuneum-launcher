@@ -160,114 +160,125 @@
               <option value="1.21.8-medium" selected>Fabric 1.21.8 MEDIUM</option>
               <option value="1.21.8-low">Fabric 1.21.8 LOW</option>
             </select>
-            <button id="install" class="play-btn hidden">УСТАНОВИТЬ</button>
             <button id="play-btn" class="play-btn hidden">ИГРАТЬ</button>
+                 <!--НЕ ЗАБЫТЬ РАСКОМИТИТЬ
+            <button id="open-game-dir" class="btn-folder" title="Открыть папку с данными">
+            <i class="fas fa-folder"></i>
+            -->
+            <button id="install" class="play-btn hidden">УСТАНОВИТЬ</button>
+            </button>
           </div>
         </div>
       </div>
       <!-- Профиль -->
-<!-- Заменить секцию профиля в HTML -->
-<div id="profile-tab" class="tab-content">
-  <div class="settings-form">
-    <h2>ПРОФИЛЬ</h2>
-    <p>Управление игровыми профилями и настройка скина</p>
+      <!-- Заменить секцию профиля в HTML -->
+      <div id="profile-tab" class="tab-content">
+        <div class="settings-form">
+          <h2>ПРОФИЛЬ</h2>
+          <p>Управление игровыми профилями и настройка скина</p>
 
-    <div class="settings-section">
-      <h3>Информация о профиле</h3>
-      
-      <div class="form-group">
-        <label>Текущий профиль</label>
-        <div class="user-info" style="margin-top: 10px; padding: 16px; background: rgba(255,255,255,0.05); border-radius: 12px;">
-          <div class="avatar-sm">
-            <img src="images/image-20-41.png" alt="Profile Avatar">
-          </div>
-          <div class="details">
-            <div class="name" id="profile-username">Загрузка...<span class="online-status"></span></div>
-            <div id="profile-access">Проходка: загрузка...</div>
-          </div>
-        </div>
-      </div>
-    </div>
+          <div class="settings-section">
+            <h3>Информация о профиле</h3>
 
-    <div class="settings-section">
-      <h3>Настройка скина</h3>
-      
-      <div class="form-group">
-        <label for="skin-upload">
-          Загрузить скин
-          <span class="tooltip">?
-            <span class="tooltip-text">Поддерживаются PNG файлы размером 64x64 или 64x32 пикселя</span>
-          </span>
-        </label>
-        <input type="file" id="skin-upload" accept="image/png,image/jpeg" 
-               style="margin-top: 8px; padding: 12px; border: 2px dashed rgba(255,140,52,0.3); border-radius: 8px; background: rgba(255,255,255,0.03);">
-      </div>
+            <div class="form-group">
+              <label>Текущий профиль</label>
+              <div class="user-info"
+                style="margin-top: 10px; padding: 16px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+                <div class="avatar-sm">
+                  <img src="images/image-20-41.png" alt="Profile Avatar">
+                </div>
+                <div class="details">
+                  <div class="name" id="profile-username">Загрузка...<span class="online-status"></span></div>
+                  <div id="profile-access">Проходка: загрузка...</div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-      <!-- Превью скина -->
-      <div id="preview-container" class="form-group" style="display: none;">
-        <label>Предпросмотр скина</label>
-        <div style="display: flex; gap: 20px; align-items: flex-start; margin-top: 12px;">
-          <div style="flex-shrink: 0;">
-            <img id="skin-preview" style="width: 128px; height: 128px; border: 2px solid var(--primary); border-radius: 8px; background: #1e2a33; image-rendering: pixelated;" alt="Skin Preview">
-          </div>
-          <div id="preview-info" style="flex: 1; color: var(--text-muted); font-size: 14px;">
-            <!-- Информация о файле будет вставлена сюда -->
-          </div>
-        </div>
-        
-        <div style="display: flex; gap: 12px; margin-top: 16px;">
-          <button id="apply-skin" class="play-btn" disabled>
-            <span class="btn-icon">✓</span>
-            Применить скин
-          </button>
-          <button id="reset-skin" class="secondary-btn">
-            <span class="btn-icon">↺</span>
-            Сбросить
-          </button>
-        </div>
-      </div>
+          <div class="settings-section">
+            <h3>Настройка скина</h3>
+
+            <div class="form-group">
+              <label for="skin-upload">
+                Загрузить скин
+                <span class="tooltip">?
+                  <span class="tooltip-text">Поддерживаются PNG файлы размером 64x64 или 64x32 пикселя</span>
+                </span>
+              </label>
+              <input type="file" id="skin-upload" accept="image/png,image/jpeg"
+                style="margin-top: 8px; padding: 12px; border: 2px dashed rgba(255,140,52,0.3); border-radius: 8px; background: rgba(255,255,255,0.03);">
+            </div>
+
+            <!-- Превью скина -->
+            <div id="preview-container" class="form-group" style="display: none;">
+              <label>Предпросмотр скина</label>
+              <div style="display: flex; gap: 20px; align-items: flex-start; margin-top: 12px;">
+                <div style="flex-shrink: 0;">
+                  <img id="skin-preview"
+                    style="width: 128px; height: 128px; border: 2px solid var(--primary); border-radius: 8px; background: #1e2a33; image-rendering: pixelated;"
+                    alt="Skin Preview">
+                </div>
+                <div id="preview-info" style="flex: 1; color: var(--text-muted); font-size: 14px;">
+                  <!-- Информация о файле будет вставлена сюда -->
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 12px; margin-top: 16px;">
+                <button id="apply-skin" class="play-btn" disabled>
+                  <span class="btn-icon">✓</span>
+                  Применить скин
+                </button>
+                <button id="reset-skin" class="secondary-btn">
+                  <span class="btn-icon">↺</span>
+                  Сбросить
+                </button>
+              </div>
+            </div>
 
             <div class="form-group" style="margin-top: 20px;">
-        <div style="background: rgba(255,193,7,0.1); padding: 12px; border-radius: 8px; border-left: 3px solid #ffc107;">
-          <div style="color: #ffc107; font-size: 14px; font-weight: 600; margin-bottom: 8px;">
-            ⚠️ Функция в разработке
-          </div>
-          <div style="color: var(--text-muted); font-size: 13px; line-height: 1.4;">
-            <strong style="color: var(--text-light);">Загрузка скинов временно недоступна.</strong><br>
-            • Функция находится в стадии разработки<br>
-            • Превью работает, но загрузка на сервер пока не реализована<br>
-            • Аватарки загружаются по умолчанию из встроенных изображений
-          </div>
-        </div>
-        
-        <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; border-left: 3px solid var(--primary); margin-top: 12px;">
-          <div style="color: var(--text-muted); font-size: 13px; line-height: 1.4;">
-            <strong style="color: var(--text-light);">Требования к скину:</strong><br>
-            • Формат: PNG или JPEG<br>
-            • Размер: 64x64 или 64x32 пикселя<br>
-            • Максимальный размер файла: 5MB<br>
-          </div>
-        </div>
-      </div>
-    </div>
+              <div
+                style="background: rgba(255,193,7,0.1); padding: 12px; border-radius: 8px; border-left: 3px solid #ffc107;">
+                <div style="color: #ffc107; font-size: 14px; font-weight: 600; margin-bottom: 8px;">
+                  ⚠️ Функция в разработке
+                </div>
+                <div style="color: var(--text-muted); font-size: 13px; line-height: 1.4;">
+                  <strong style="color: var(--text-light);">Загрузка скинов временно недоступна.</strong><br>
+                  • Функция находится в стадии разработки<br>
+                  • Превью работает, но загрузка на сервер пока не реализована<br>
+                  • Аватарки загружаются по умолчанию из встроенных изображений
+                </div>
+              </div>
 
-    <div class="settings-section">
-      <h3>Действия с профилем</h3>
-      
-      <div style="display: flex; gap: 16px; flex-wrap: wrap;">
-        <button class="play-btn" style="flex: 1; min-width: 200px;" onclick="showToast('Функция в разработке', 'info')">
-          <span class="btn-icon">💾</span>
-          Экспорт профиля
-        </button>
-        
-        <button class="secondary-btn" style="flex: 1; min-width: 200px;" onclick="handleLogout()">
-          <span class="btn-icon">🚪</span>
-          Выйти из аккаунта
-        </button>
+              <div
+                style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; border-left: 3px solid var(--primary); margin-top: 12px;">
+                <div style="color: var(--text-muted); font-size: 13px; line-height: 1.4;">
+                  <strong style="color: var(--text-light);">Требования к скину:</strong><br>
+                  • Формат: PNG или JPEG<br>
+                  • Размер: 64x64 или 64x32 пикселя<br>
+                  • Максимальный размер файла: 5MB<br>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h3>Действия с профилем</h3>
+
+            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+              <button class="play-btn" style="flex: 1; min-width: 200px;"
+                onclick="showToast('Функция в разработке', 'info')">
+                <span class="btn-icon">💾</span>
+                Экспорт профиля
+              </button>
+
+              <button class="secondary-btn" style="flex: 1; min-width: 200px;" onclick="handleLogout()">
+                <span class="btn-icon">🚪</span>
+                Выйти из аккаунта
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</div>
 
       <!-- Настройки -->
       <div id="settings-tab" class="tab-content">
@@ -276,148 +287,148 @@
           <p>Настройте параметры лаунчера и игры для оптимального опыта.</p>
 
           <!-- Настройки памяти -->
-<div class="settings-section">
-  <h3>Управление памятью</h3>
+          <div class="settings-section">
+            <h3>Управление памятью</h3>
 
-  <div class="form-group">
-    <label for="max-memory">
-      Максимальная память:
-      <span class="tooltip">?
-        <span class="tooltip-text">Максимальный объем ОЗУ, выделяемый для Minecraft</span>
-      </span>
-    </label>
-    <div class="memory-slider-container">
-      <input type="range" id="max-memory" min="2" max="16" value="4" class="memory-slider">
-      <div class="memory-display">
-        <span id="max-memory-value">4 GB</span>
-        <span class="memory-percentage" id="memory-percentage"></span>
-      </div>
-    </div>
-  </div>
-
-  <div class="form-group">
-    <label for="min-memory">
-      Минимальная память:
-      <span class="tooltip">?
-        <span class="tooltip-text">Начальный объем памяти при запуске</span>
-      </span>
-    </label>
-    <div class="memory-control">
-      <input type="range" id="min-memory" min="1" max="8" value="2" class="memory-slider">
-      <div class="memory-display">
-        <span id="min-memory-value">2 GB</span>
-      </div>
-    </div>
-    <div class="system-memory-info" id="memory-system-info">
-    </div>
-  </div>
-</div>
-            <!-- Настройки Java -->
-            <div class="settings-section">
-              <h3>Настройки Java</h3>
-
-              <div class="form-group">
-                <label for="java-path">
-                  Путь к Java:
-                  <span class="tooltip">?
-                    <span class="tooltip-text">Лаунчер автоматически определит лучшую версию Java</span>
-                  </span>
-                </label>
-                <div class="java-path-container">
-                  <input type="text" id="java-path" value="(Автоматически)" readonly class="java-path-input">
-                  <button id="select-java-path" class="secondary-btn">Выбрать</button>
-                </div>
-                <div class="java-status" id="java-status">
-                  <!-- Здесь будет статус Java -->
+            <div class="form-group">
+              <label for="max-memory">
+                Максимальная память:
+                <span class="tooltip">?
+                  <span class="tooltip-text">Максимальный объем ОЗУ, выделяемый для Minecraft</span>
+                </span>
+              </label>
+              <div class="memory-slider-container">
+                <input type="range" id="max-memory" min="2" max="16" value="4" class="memory-slider">
+                <div class="memory-display">
+                  <span id="max-memory-value">4 GB</span>
+                  <span class="memory-percentage" id="memory-percentage"></span>
                 </div>
               </div>
             </div>
 
-            <!-- Настройки производительности -->
-            <div class="settings-section">
-              <h3>Производительность</h3>
-
-              <div class="form-group">
-                <label>
-                  Приоритет процесса:
-                  <span class="tooltip">?
-                    <span class="tooltip-text">Высокий приоритет может улучшить производительность</span>
-                  </span>
-                </label>
-                <div class="checkbox-container">
-                  <input type="checkbox" id="high-priority" class="settings-checkbox">
-                  <label for="high-priority" class="checkbox-label">Высокий приоритет</label>
+            <div class="form-group">
+              <label for="min-memory">
+                Минимальная память:
+                <span class="tooltip">?
+                  <span class="tooltip-text">Начальный объем памяти при запуске</span>
+                </span>
+              </label>
+              <div class="memory-control">
+                <input type="range" id="min-memory" min="1" max="8" value="2" class="memory-slider">
+                <div class="memory-display">
+                  <span id="min-memory-value">2 GB</span>
                 </div>
               </div>
-
-              <div class="form-group">
-                <label>
-                  Оптимизация сборщика мусора:
-                  <span class="tooltip">?
-                    <span class="tooltip-text">Улучшает производительность за счет оптимизации работы с памятью</span>
-                  </span>
-                </label>
-                <div class="checkbox-container">
-                  <input type="checkbox" id="gc-optimization" class="settings-checkbox" checked>
-                  <label for="gc-optimization" class="checkbox-label">Включить оптимизацию GC</label>
-                </div>
+              <div class="system-memory-info" id="memory-system-info">
               </div>
-            </div>
-
-            <!-- Настройки лаунчера -->
-            <div class="settings-section">
-              <h3>Настройки лаунчера</h3>
-
-              <div class="form-group">
-                <label>
-                  Автообновления:
-                  <span class="tooltip">?
-                    <span class="tooltip-text">Автоматически проверять и устанавливать обновления</span>
-                  </span>
-                </label>
-                <div class="checkbox-container">
-                  <input type="checkbox" id="auto-updates" class="settings-checkbox" checked>
-                  <label for="auto-updates" class="checkbox-label">Автоматические обновления</label>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label>
-                  Закрытие лаунчера:
-                  <span class="tooltip">?
-                    <span class="tooltip-text">Закрывать лаунчер после запуска игры</span>
-                  </span>
-                </label>
-                <div class="checkbox-container">
-                  <input type="checkbox" id="close-launcher" class="settings-checkbox">
-                  <label for="close-launcher" class="checkbox-label">Закрывать после запуска</label>
-                </div>
-              </div>
-            </div>
-
-            <div class="settings-actions">
-              <button id="save-settings" class="play-btn">Сохранить настройки</button>
-              <button id="reset-settings" class="secondary-btn">Сбросить</button>
-              <button id="check-updates-manual" class="secondary-btn">Проверить обновления</button>
             </div>
           </div>
-        </div>
+          <!-- Настройки Java -->
+          <div class="settings-section">
+            <h3>Настройки Java</h3>
 
-        <!-- Логи -->
-        <div id="logs-tab" class="tab-content">
-          <div class="settings-form">
-            <h2>ЖУРНАЛ СОБЫТИЙ</h2>
-            <p>История работы лаунчера</p>
-
-            <div id="log-container"
-              style="background-color: #1e2a33; border-radius: 8px; padding: 20px; color: var(--text-light); font-family: monospace; height: 100%; overflow-y: auto; white-space: pre-wrap;">
+            <div class="form-group">
+              <label for="java-path">
+                Путь к Java:
+                <span class="tooltip">?
+                  <span class="tooltip-text">Лаунчер автоматически определит лучшую версию Java</span>
+                </span>
+              </label>
+              <div class="java-path-container">
+                <input type="text" id="java-path" value="(Автоматически)" readonly class="java-path-input">
+                <button id="select-java-path" class="secondary-btn">Выбрать</button>
+              </div>
+              <div class="java-status" id="java-status">
+                <!-- Здесь будет статус Java -->
+              </div>
             </div>
+          </div>
+
+          <!-- Настройки производительности -->
+          <div class="settings-section">
+            <h3>Производительность</h3>
+
+            <div class="form-group">
+              <label>
+                Приоритет процесса:
+                <span class="tooltip">?
+                  <span class="tooltip-text">Высокий приоритет может улучшить производительность</span>
+                </span>
+              </label>
+              <div class="checkbox-container">
+                <input type="checkbox" id="high-priority" class="settings-checkbox">
+                <label for="high-priority" class="checkbox-label">Высокий приоритет</label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>
+                Оптимизация сборщика мусора:
+                <span class="tooltip">?
+                  <span class="tooltip-text">Улучшает производительность за счет оптимизации работы с памятью</span>
+                </span>
+              </label>
+              <div class="checkbox-container">
+                <input type="checkbox" id="gc-optimization" class="settings-checkbox" checked>
+                <label for="gc-optimization" class="checkbox-label">Включить оптимизацию GC</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Настройки лаунчера -->
+          <div class="settings-section">
+            <h3>Настройки лаунчера</h3>
+
+            <div class="form-group">
+              <label>
+                Автообновления:
+                <span class="tooltip">?
+                  <span class="tooltip-text">Автоматически проверять и устанавливать обновления</span>
+                </span>
+              </label>
+              <div class="checkbox-container">
+                <input type="checkbox" id="auto-updates" class="settings-checkbox" checked>
+                <label for="auto-updates" class="checkbox-label">Автоматические обновления</label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>
+                Закрытие лаунчера:
+                <span class="tooltip">?
+                  <span class="tooltip-text">Закрывать лаунчер после запуска игры</span>
+                </span>
+              </label>
+              <div class="checkbox-container">
+                <input type="checkbox" id="close-launcher" class="settings-checkbox">
+                <label for="close-launcher" class="checkbox-label">Закрывать после запуска</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-actions">
+            <button id="save-settings" class="play-btn">Сохранить настройки</button>
+            <button id="reset-settings" class="secondary-btn">Сбросить</button>
+            <button id="check-updates-manual" class="secondary-btn">Проверить обновления</button>
           </div>
         </div>
       </div>
+
+      <!-- Логи -->
+      <div id="logs-tab" class="tab-content">
+        <div class="settings-form">
+          <h2>ЖУРНАЛ СОБЫТИЙ</h2>
+          <p>История работы лаунчера</p>
+
+          <div id="log-container"
+            style="background-color: #1e2a33; border-radius: 8px; padding: 20px; color: var(--text-light); font-family: monospace; height: 100%; overflow-y: auto; white-space: pre-wrap;">
+          </div>
+        </div>
+      </div>
     </div>
-<!-- В конце body -->
-<script type="module" src="scripts/main.js"></script>
+  </div>
+  <!-- В конце body -->
+  <script type="module" src="scripts/main.js"></script>
 </body>
 
 </html>

@@ -194,3 +194,18 @@ export async function getAppInfo() {
         appendLog("Не удалось получить версию лаунчера", "warning");
     }
 }
+export async function openGameDirectory() {
+    if (!state.isElectron || !state.electronAPI) {
+        showToast("Функция доступна только в приложении", "error");
+        return;
+    }
+    
+    try {
+        await state.electronAPI.openGameDirectory();
+        appendLog("Открыта папка игры", "info");
+        showToast("Папка игры открыта", "success");
+    } catch (error) {
+        showToast(`Ошибка открытия папки: ${error.message}`, "error");
+        appendLog(`Ошибка открытия папки: ${error.message}`, "error");
+    }
+}

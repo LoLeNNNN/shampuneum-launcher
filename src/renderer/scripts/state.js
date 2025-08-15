@@ -50,7 +50,8 @@ const elements = {
     toast: document.getElementById("toast"),
     logContainer: document.getElementById("log-container"),
     updateBadge: document.getElementById("update-badge"),
-    versionSelect: document.getElementById("version-select")
+    versionSelect: document.getElementById("version-select"),
+    openGameDirBtn: document.getElementById("open-game-dir")
 };
 
 export { state, elements };

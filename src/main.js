@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require("electron");
+const { app, BrowserWindow, ipcMain, dialog, shell } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const os = require("os");
@@ -7,6 +7,7 @@ const { launchMinecraft, checkGameStatus } = require("./launcher");
 const fetch = require("node-fetch");
 const LauncherUpdater = require("./updater");
 const crypto = require("crypto");
+const ps = require('ps-node');
 
 let updater;
 let mainWindow;
@@ -337,7 +338,20 @@ ipcMain.handle("show-info-dialog", async (_, title, content) => {
 });
 
 ipcMain.handle("get-app-version", () => app.getVersion());
+ipcMain.handle('open-game-directory', async () => {
+    const gamePath = path.join(app.getPath('appData'), '.shampuneum');
+    shell.openPath(gamePath);
+});
 
+// Проверка запущенных процессов
+ipcMain.handle('is-game-running', async () => {
+    return new Promise((resolve) => {
+        ps.lookup({ command: 'javaw.exe' }, (err, processes) => {
+            if (err) return resolve({ isRunning: false });
+            resolve({ isRunning: processes.length > 0 });
+        });
+    });
+});
 ipcMain.handle("select-java-path", async () => {
   return dialog.showOpenDialog(mainWindow, {
     properties: ["openFile"],

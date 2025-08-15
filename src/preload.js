@@ -52,5 +52,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Новые методы для автозапоминания аккаунта
 getSavedAccount: () => ipcRenderer.invoke('get-saved-account'),
 autoLogin: () => ipcRenderer.invoke('auto-login'),
-clearSavedAccount: () => ipcRenderer.invoke('clear-saved-account')
+clearSavedAccount: () => ipcRenderer.invoke('clear-saved-account'),
+    openGameDirectory: () => ipcRenderer.invoke('open-game-directory'),
+    isGameRunning: () => ipcRenderer.invoke('is-game-running')
 });

@@ -1737,3 +1737,14 @@ input[type="file"]::file-selector-button:hover {
     flex: none !important;
   }
 }
+.version-line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    color: #ddd;
+}

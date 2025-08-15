@@ -43,7 +43,10 @@ function setupEventListeners() {
     if (elements.checkUpdatesBtn) {
         elements.checkUpdatesBtn.addEventListener("click", checkForUpdatesManually);
     }
-    
+        // Кнопка открытия папки игры
+    if (elements.openGameDirBtn) {
+        elements.openGameDirBtn.addEventListener("click", openGameDirectory);
+    }
     // Память
     if (elements.maxMemoryInput) {
         elements.maxMemoryInput.addEventListener("input", updateMemoryPercentage);
@@ -130,6 +133,10 @@ async function initializeSettings() {
     appendLog("Настройки инициализированы", "success");
 }
 
+async function openGameDirectory() {
+    const { openGameDirectory } = await import('./settings.js');
+    openGameDirectory();
+}
 // Основная инициализация
 async function initialize() {
     appendLog("=== SHAMPUNEUM LAUNCHER ===");

@@ -77,6 +77,17 @@ export async function handleInstall() {
         updateButtonStates();
     }
 }
+async function isGameRunning() {
+    if (!state.isElectron || !state.electronAPI) return false;
+    
+    try {
+        const result = await state.electronAPI.isGameRunning();
+        return result.isRunning;
+    } catch (error) {
+        appendLog(`Ошибка проверки запущенных процессов: ${error.message}`, "warning");
+        return false;
+    }
+}
 
 // Запуск игры
 export async function handlePlay() {
@@ -86,7 +97,10 @@ export async function handlePlay() {
         showToast("Сначала установите клиент", "error");
         return;
     }
-    
+    if (await isGameRunning()) {
+        showToast("Игра уже запущена! Закройте текущий процесс перед запуском нового", "error");
+        return;
+    }
     state.isPlaying = true;
     updateButtonStates();
     
